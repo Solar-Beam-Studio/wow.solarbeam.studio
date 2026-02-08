@@ -1,12 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useGuilds, useDeleteGuild } from "@/hooks/use-guilds";
 import { Plus, Trash2, ExternalLink, AlertCircle } from "lucide-react";
 
 export default function GuildsPage() {
   const { data: guilds, isLoading } = useGuilds();
   const deleteGuild = useDeleteGuild();
+  const t = useTranslations("guilds");
 
   if (isLoading) {
     return (
@@ -20,12 +22,12 @@ export default function GuildsPage() {
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
         <div>
-          <h1 className="text-3xl font-display font-black tracking-tight mb-2">My Guilds</h1>
-          <p className="text-sm text-[var(--text-secondary)] font-medium">Your connected World of Warcraft guilds.</p>
+          <h1 className="text-3xl font-display font-black tracking-tight mb-2">{t("heading")}</h1>
+          <p className="text-sm text-[var(--text-secondary)] font-medium">{t("subtitle")}</p>
         </div>
 
         <Link href="/guilds/new" className="h-11 px-6 bg-accent text-white rounded-xl font-bold hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 flex items-center gap-2 w-fit">
-          <Plus className="w-4 h-4" /> Add Guild
+          <Plus className="w-4 h-4" /> {t("addGuild")}
         </Link>
       </div>
 
@@ -35,10 +37,10 @@ export default function GuildsPage() {
             <AlertCircle className="w-8 h-8" />
           </div>
           <div className="max-w-xs">
-            <h3 className="text-xl font-display font-bold mb-2">No Guilds Connected</h3>
-            <p className="text-sm text-[var(--text-secondary)] font-medium mb-6">Add your first guild to start syncing data from Blizzard and Raider.IO.</p>
+            <h3 className="text-xl font-display font-bold mb-2">{t("noGuildsTitle")}</h3>
+            <p className="text-sm text-[var(--text-secondary)] font-medium mb-6">{t("noGuildsDescription")}</p>
             <Link href="/guilds/new" className="h-11 px-6 bg-accent text-white rounded-xl font-bold hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 flex items-center gap-2 justify-center">
-              <Plus className="w-4 h-4" /> Add Your First Guild
+              <Plus className="w-4 h-4" /> {t("addFirstGuild")}
             </Link>
           </div>
         </div>
@@ -56,7 +58,7 @@ export default function GuildsPage() {
                 <div className="min-w-0">
                   <h2 className="font-display font-bold text-lg group-hover:text-accent transition-colors truncate">{guild.name}</h2>
                   <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">
-                    {guild.realm} — {guild.region.toUpperCase()} · {guild._count?.members ?? guild.memberCount} members
+                    {guild.realm} — {guild.region.toUpperCase()} · {guild._count?.members ?? guild.memberCount} {t("members")}
                   </p>
                 </div>
               </Link>
@@ -66,16 +68,16 @@ export default function GuildsPage() {
                   href={`/g/${guild.id}`}
                   className="h-9 px-4 bg-accent text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm shadow-accent/10 hover:bg-accent-hover"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" /> View Roster
+                  <ExternalLink className="w-3.5 h-3.5" /> {t("viewRoster")}
                 </Link>
                 <button
                   onClick={() => {
-                    if (confirm(`Delete "${guild.name}"? This cannot be undone.`)) {
+                    if (confirm(t("deleteConfirm", { name: guild.name }))) {
                       deleteGuild.mutate(guild.id);
                     }
                   }}
                   className="w-9 h-9 bg-[var(--bg-tertiary)] hover:bg-red-500/10 border border-[var(--border)] rounded-xl flex items-center justify-center text-[var(--text-secondary)] hover:text-red-500 transition-all"
-                  title="Delete Guild"
+                  title={t("deleteGuild")}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

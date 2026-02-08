@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { ExternalLink } from "lucide-react";
 import {
   CLASS_COLORS,
@@ -37,6 +38,9 @@ function raidSortValue(raidProgress: string | null): number {
 }
 
 export function MemberTable({ members, region, search }: MemberTableProps) {
+  const t = useTranslations("table");
+  const locale = useLocale();
+
   const filtered = useMemo(() => {
     if (!search) return members;
     const lower = search.toLowerCase();
@@ -54,7 +58,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
   const columns: Column<GuildMember>[] = [
     {
       key: "characterName",
-      label: "Character",
+      label: t("character"),
       align: "left",
       sticky: true,
       sortValue: (m) => m.characterName.toLowerCase(),
@@ -84,7 +88,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "level",
-      label: "Lvl",
+      label: t("level"),
       align: "right",
       sortValue: (m) => m.level ?? 0,
       render: (m) => (
@@ -93,7 +97,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "activityStatus",
-      label: "Status",
+      label: t("status"),
       align: "center",
       sortValue: (m) => (m.activityStatus === "active" ? 1 : 0),
       render: (m) => (
@@ -111,7 +115,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "itemLevel",
-      label: "iLvl",
+      label: t("itemLevel"),
       align: "right",
       sortValue: (m) => m.itemLevel ?? 0,
       render: (m) => (
@@ -122,7 +126,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "mythicPlusScore",
-      label: "M+",
+      label: t("mythicPlus"),
       align: "right",
       sortValue: (m) => m.mythicPlusScore ?? 0,
       render: (m) => (
@@ -133,7 +137,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "raidProgress",
-      label: "Raids",
+      label: t("raids"),
       align: "right",
       sortValue: (m) => raidSortValue(m.raidProgress),
       render: (m) =>
@@ -145,21 +149,21 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     },
     {
       key: "achievementPoints",
-      label: "Achiev",
+      label: t("achievements"),
       align: "right",
       sortValue: (m) => m.achievementPoints ?? 0,
       render: (m) => (
         <span className={`text-[0.8125rem] font-mono font-medium tabular-nums ${ratingColor(m.achievementPoints, "achievement")}`}>
-          {m.achievementPoints?.toLocaleString() || "-"}
+          {m.achievementPoints?.toLocaleString(locale) || "-"}
         </span>
       ),
     },
     ...([
-      { key: "pvp2v2Rating", label: "2v2" },
-      { key: "pvp3v3Rating", label: "3v3" },
-      { key: "pvpRbgRating", label: "RBG" },
-      { key: "soloShuffleRating", label: "Solo" },
-      { key: "rbgShuffleRating", label: "Blitz" },
+      { key: "pvp2v2Rating", label: t("pvp2v2") },
+      { key: "pvp3v3Rating", label: t("pvp3v3") },
+      { key: "pvpRbgRating", label: t("pvpRbg") },
+      { key: "soloShuffleRating", label: t("pvpSolo") },
+      { key: "rbgShuffleRating", label: t("pvpBlitz") },
     ] as const).map((pvp) => ({
       key: pvp.key,
       label: pvp.label,
@@ -176,13 +180,13 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
     })),
     {
       key: "lastUpdated",
-      label: "Updated",
+      label: t("updated"),
       align: "right",
       sortValue: (m) => (m.lastUpdated ? new Date(m.lastUpdated).getTime() : 0),
       render: (m) => (
         <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] opacity-20 tabular-nums uppercase">
           {m.lastUpdated
-            ? new Date(m.lastUpdated).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+            ? new Date(m.lastUpdated).toLocaleDateString(locale, { month: "short", day: "numeric" })
             : "-"}
         </span>
       ),
@@ -196,7 +200,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       rowKey={(m) => `${m.characterName}-${m.realm}`}
       defaultSortKey="itemLevel"
       defaultSortDirection="desc"
-      emptyMessage="No guild members found matching your search."
+      emptyMessage={t("noResults")}
     />
   );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useTheme } from "@/hooks/use-theme";
 import { AppLogo } from "@/components/app-logo";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Sun, Moon, Zap, LayoutGrid, LogOut, LogIn, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -14,6 +15,7 @@ export function Sidebar() {
   const { data: session } = useSession();
   const { dark, toggle } = useTheme();
   const isLoggedIn = !!session?.user;
+  const t = useTranslations("sidebar");
 
   const navLink = (href: string, label: string, icon: ReactNode, active: boolean) => (
     <Link
@@ -34,21 +36,24 @@ export function Sidebar() {
       <div className="bg-[var(--bg-secondary)] rounded-2xl p-3 flex flex-col h-full overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <AppLogo href="/" />
-          <button
-            onClick={toggle}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
-            title="Toggle Theme"
-          >
-            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <LanguageSwitcher />
+            <button
+              onClick={toggle}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
+              title={t("toggleTheme")}
+            >
+              {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
         <div className="flex flex-col gap-8 grow">
           <section className="flex flex-col gap-1.5">
-            <p className="px-4 text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-2">Navigation</p>
-            {navLink("/", "Explore", <Zap className="w-4 h-4" />, pathname === "/")}
-            {navLink("/guilds", "My Guilds", <LayoutGrid className="w-4 h-4" />, pathname.startsWith("/guilds"))}
+            <p className="px-4 text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-2">{t("navigation")}</p>
+            {navLink("/", t("explore"), <Zap className="w-4 h-4" />, pathname === "/")}
+            {navLink("/guilds", t("myGuilds"), <LayoutGrid className="w-4 h-4" />, pathname.startsWith("/guilds"))}
           </section>
         </div>
 
@@ -73,7 +78,7 @@ export function Sidebar() {
                   router.push("/");
                 }}
                 className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                title="Sign Out"
+                title={t("signOut")}
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -82,11 +87,11 @@ export function Sidebar() {
             <div className="flex flex-col gap-2">
               <Link href="/signup" className="btn btn-primary w-full font-bold shadow-lg shadow-accent/20 h-11">
                 <UserPlus className="w-4 h-4" />
-                Get Started
+                {t("getStarted")}
               </Link>
               <Link href="/login" className="btn btn-ghost w-full font-bold h-11">
                 <LogIn className="w-4 h-4" />
-                Sign In
+                {t("signIn")}
               </Link>
             </div>
           )}

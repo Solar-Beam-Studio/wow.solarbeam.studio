@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { MemberTable } from "@/components/member-table";
 import type { GuildMember } from "@/hooks/use-members";
@@ -13,6 +14,7 @@ export function PublicGuildClient({
   region: string;
 }) {
   const [search, setSearch] = useState("");
+  const t = useTranslations("guildDetail");
 
   return (
     <>
@@ -22,7 +24,7 @@ export function PublicGuildClient({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search members..."
+          placeholder={t("searchPlaceholder")}
           className="w-full h-10 pl-11 pr-4 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--text)] placeholder:text-[var(--text-secondary)]/50"
         />
       </div>

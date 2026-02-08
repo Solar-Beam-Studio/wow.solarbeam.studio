@@ -1,24 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useCreateGuild } from "@/hooks/use-guilds";
 import { toast } from "sonner";
-
-const REGIONS = [
-  { value: "eu", label: "Europe" },
-  { value: "us", label: "Americas" },
-  { value: "kr", label: "Korea" },
-  { value: "tw", label: "Taiwan" },
-];
 
 export default function NewGuildPage() {
   const router = useRouter();
   const createGuild = useCreateGuild();
+  const t = useTranslations("newGuild");
 
   const [name, setName] = useState("");
   const [realm, setRealm] = useState("");
   const [region, setRegion] = useState("eu");
+
+  const REGIONS = [
+    { value: "eu", label: t("regionEurope") },
+    { value: "us", label: t("regionAmericas") },
+    { value: "kr", label: t("regionKorea") },
+    { value: "tw", label: t("regionTaiwan") },
+  ];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +29,7 @@ export default function NewGuildPage() {
       { name, realm, region },
       {
         onSuccess: (guild) => {
-          toast.success(`Guild "${name}" added! Discovery starting...`);
+          toast.success(t("successToast", { name }));
           router.push(`/g/${guild.id}`);
         },
       }
@@ -36,40 +38,40 @@ export default function NewGuildPage() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-3xl font-light tracking-tight mb-8">Add Guild</h1>
+      <h1 className="text-3xl font-light tracking-tight mb-8">{t("heading")}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-widest mb-2">
-            Guild Name
+            {t("guildNameLabel")}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Pool Party"
+            placeholder={t("guildNamePlaceholder")}
             required
             className="w-full h-11 px-4 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--text)]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-widest mb-2">Realm</label>
+          <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("realmLabel")}</label>
           <input
             type="text"
             value={realm}
             onChange={(e) => setRealm(e.target.value)}
-            placeholder="archimonde"
+            placeholder={t("realmPlaceholder")}
             required
             className="w-full h-11 px-4 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--text)]"
           />
           <p className="text-xs text-[var(--text-secondary)] mt-2">
-            Use the realm slug (lowercase, hyphens instead of spaces)
+            {t("realmHint")}
           </p>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-widest mb-2">Region</label>
+          <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-widest mb-2">{t("regionLabel")}</label>
           <select
             value={region}
             onChange={(e) => setRegion(e.target.value)}
@@ -88,7 +90,7 @@ export default function NewGuildPage() {
           disabled={createGuild.isPending}
           className="w-full h-11 bg-[var(--text)] text-[var(--bg)] hover:opacity-80 disabled:opacity-50 rounded-xl text-sm font-medium tracking-wide transition-opacity"
         >
-          {createGuild.isPending ? "Adding guild..." : "Add Guild"}
+          {createGuild.isPending ? t("submitLoading") : t("submit")}
         </button>
       </form>
     </div>

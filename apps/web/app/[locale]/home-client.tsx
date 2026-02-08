@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { DataTable, type Column } from "@/components/data-table";
 import { Activity, Users, ArrowRight, BarChart3, Plus, Search, ShieldCheck, Timer } from "lucide-react";
@@ -34,6 +35,8 @@ interface HomeClientProps {
 
 export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters }: HomeClientProps) {
   const [search, setSearch] = useState("");
+  const t = useTranslations("home");
+  const tt = useTranslations("table");
 
   const filteredGuilds = useMemo(() => {
     if (!search) return guilds;
@@ -61,7 +64,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
   const topCharacterColumns: Column<TopCharacter>[] = [
     {
       key: "characterName",
-      label: "Character",
+      label: tt("character"),
       sortValue: (c) => c.characterName.toLowerCase(),
       render: (c) => (
         <>
@@ -77,7 +80,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
     },
     {
       key: "guild",
-      label: "Guild",
+      label: tt("guild"),
       render: (c) => (
         <Link
           href={`/g/${c.guild.id}`}
@@ -89,7 +92,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
     },
     {
       key: "itemLevel",
-      label: "iLvl",
+      label: tt("itemLevel"),
       align: "right",
       sortValue: (c) => c.itemLevel ?? 0,
       render: (c) =>
@@ -101,7 +104,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
     },
     {
       key: "mythicPlusScore",
-      label: "M+",
+      label: tt("mythicPlus"),
       align: "right",
       sortValue: (c) => c.mythicPlusScore ?? 0,
       render: (c) =>
@@ -122,17 +125,17 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
         <div className="p-4 md:p-6 lg:p-8 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
-              <h1 className="text-3xl font-display font-black tracking-tight mb-2">Global Network</h1>
-              <p className="text-sm text-[var(--text-secondary)] font-medium">Real-time sync across {guilds.length} guilds and {totalMembers} characters.</p>
+              <h1 className="text-3xl font-display font-black tracking-tight mb-2">{t("heading")}</h1>
+              <p className="text-sm text-[var(--text-secondary)] font-medium">{t("subtitle", { guildCount: guilds.length, memberCount: totalMembers })}</p>
             </div>
-            
+
             <div className="relative max-w-md w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search guilds, characters or realms..."
+                placeholder={t("searchPlaceholder")}
                 className="w-full h-12 pl-12 pr-4 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all shadow-inner"
               />
             </div>
@@ -143,20 +146,20 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
             <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-accent to-accent-hover rounded-[2rem] p-8 text-white shadow-2xl shadow-accent/20">
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/10 backdrop-blur-sm">
-                  <Activity className="w-3 h-3" /> Live Data Stream
+                  <Activity className="w-3 h-3" /> {t("liveDataStream")}
                 </div>
                 <h2 className="text-4xl font-display font-black tracking-tight mb-4 leading-tight">
-                  The Sync Engine for <br/>Modern Guilds.
+                  {t("heroTitle")}
                 </h2>
                 <p className="text-lg text-white/80 mb-8 font-medium max-w-xl">
-                  Automated performance tracking, roster management, and activity insights for World of Warcraft guilds.
+                  {t("heroDescription")}
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <Link href="/signup" className="h-11 px-6 bg-white text-accent rounded-xl font-bold hover:bg-white/90 transition-all shadow-lg flex items-center gap-2">
-                    Start Syncing <ArrowRight className="w-4 h-4" />
+                    {t("startSyncing")} <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link href="/login" className="h-11 px-6 bg-white/10 text-white rounded-xl font-bold border border-white/20 hover:bg-white/20 transition-all backdrop-blur-md flex items-center">
-                    Member Login
+                    {t("memberLogin")}
                   </Link>
                 </div>
               </div>
@@ -172,7 +175,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
                     <Users className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">Active Players</p>
+                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">{t("activePlayers")}</p>
                     <p className="text-2xl font-display font-bold">{activeMembers.toLocaleString()}</p>
                   </div>
                </div>
@@ -181,7 +184,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">Verified Guilds</p>
+                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">{t("verifiedGuilds")}</p>
                     <p className="text-2xl font-display font-bold">{guilds.length}</p>
                   </div>
                </div>
@@ -190,7 +193,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
                     <Timer className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">Live Syncs</p>
+                    <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-0.5">{t("liveSyncs")}</p>
                     <p className="text-2xl font-display font-bold">24/7</p>
                   </div>
                </div>
@@ -201,15 +204,15 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
             {/* Guilds List - 2/3 width on XL */}
             <div className="xl:col-span-2 space-y-6">
               <div className="flex items-center justify-between px-2">
-                <h2 className="text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">Connected Guilds</h2>
+                <h2 className="text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("connectedGuilds")}</h2>
                 <Link href="/guilds/new" className="text-xs font-bold text-accent hover:underline flex items-center gap-1">
-                  <Plus className="w-3 h-3" /> Add Your Guild
+                  <Plus className="w-3 h-3" /> {t("addYourGuild")}
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {filteredGuilds.length === 0 ? (
                   <div className="md:col-span-2 bg-[var(--bg-tertiary)] rounded-2xl p-12 text-center border-2 border-dashed border-[var(--border)]">
-                    <p className="text-sm text-[var(--text-secondary)] font-medium">{search ? "No guilds match your search." : "No guilds tracked yet."}</p>
+                    <p className="text-sm text-[var(--text-secondary)] font-medium">{search ? t("noGuildsMatch") : t("noGuildsYet")}</p>
                   </div>
                 ) : (
                   filteredGuilds.slice(0, 10).map((guild) => (
@@ -231,7 +234,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-bold">{guild.memberCount}</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase opacity-50">Members</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase opacity-50">{t("members")}</p>
                       </div>
                     </Link>
                   ))
@@ -242,7 +245,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
             {/* Top Performers */}
             <div>
               <div className="flex items-center justify-between mb-4 px-2">
-                <h2 className="text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">Top Ranks</h2>
+                <h2 className="text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("topRanks")}</h2>
               </div>
               <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-3xl overflow-hidden shadow-sm">
                 <DataTable
@@ -261,6 +264,3 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
     </div>
   );
 }
-
-
-

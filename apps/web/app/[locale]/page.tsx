@@ -1,9 +1,17 @@
 import { prisma } from "@wow/database";
+import { setRequestLocale } from "next-intl/server";
 import { HomeClient } from "./home-client";
 
 export const revalidate = 60;
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const [guilds, totalMembers, activeMembers, topCharacters] = await Promise.all([
     prisma.guild.findMany({
       orderBy: { updatedAt: "desc" },
