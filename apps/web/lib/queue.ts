@@ -7,7 +7,7 @@ const connection = {
 };
 
 export const guildDiscoveryQueue = new Queue("guild-discovery", { connection });
-export const syncSchedulerQueue = new Queue("sync-scheduler", { connection });
+const syncSchedulerQueue = new Queue("sync-scheduler", { connection });
 
 export async function enqueueImmediateDiscovery(guildId: string) {
   await guildDiscoveryQueue.add(
