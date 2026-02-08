@@ -23,7 +23,7 @@
     "topRanks": "Meilleurs Classements"
   },
   "login": {
-    "brandName": "Guild Sync",
+    "brandName": "WoW Guilds",
     "heading": "Bon Retour.",
     "subtitle": "Continuez à gérer votre réseau de guildes.",
     "emailLabel": "Adresse Email",
@@ -37,7 +37,7 @@
     "invalidCredentials": "Identifiants invalides"
   },
   "signup": {
-    "brandName": "Guild Sync",
+    "brandName": "WoW Guilds",
     "heading": "Créer un Compte.",
     "subtitle": "Commencez à suivre votre guilde en quelques secondes.",
     "nameLabel": "Nom Complet",

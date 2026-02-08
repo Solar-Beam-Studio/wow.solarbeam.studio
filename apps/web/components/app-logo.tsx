@@ -15,10 +15,7 @@ export function AppLogo({ href = "/", className }: { href?: string; className?: 
       <div className="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center text-white shadow-lg shadow-accent/30">
         <Picto className="w-6 h-6" />
       </div>
-      <div className="flex flex-col">
-        <span className="text-lg font-display font-bold tracking-tight leading-none uppercase">Sync</span>
-        <span className="text-[10px] font-mono font-medium text-accent uppercase tracking-widest opacity-80">Guild Sync</span>
-      </div>
+      <span className="text-lg font-display font-bold tracking-tight leading-none">WoW Guilds</span>
     </Link>
   );
 }
