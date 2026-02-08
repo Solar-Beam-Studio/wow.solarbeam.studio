@@ -1,8 +1,6 @@
 services:
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     volumes:
       - redis-data:/data
     restart: unless-stopped
@@ -16,10 +14,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
     ports:
       - "3000:3000"
     env_file: .env
     environment:
+      - NODE_ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
@@ -31,6 +32,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
   worker:
     build:
@@ -38,6 +44,7 @@ services:
       dockerfile: apps/worker/Dockerfile
     env_file: .env
     environment:
+      - NODE_ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
@@ -49,6 +56,11 @@ services:
         limits:
           memory: 512M
           cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
 volumes:
   redis-data:

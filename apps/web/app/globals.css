@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fcfcfc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f7;
+  --text: #1d1d1f;
+  --text-secondary: #86868b;
+  --border: #f2f2f2;
+  --input: #ffffff;
+  --accent: #5865F2;
+  --accent-foreground: #ffffff;
+}
+
+.dark {
+  --bg: #030303;
+  --bg-secondary: #0f0f0f;
+  --bg-tertiary: #1a1a1a;
+  --text: #ffffff;
+  --text-secondary: #94a3b8;
+  --border: transparent;
+  --input: #0f0f0f;
+  --accent: #5865F2;
+  --accent-foreground: #ffffff;
+}
+
+@theme {
+  --font-display: var(--font-display);
+  --font-mono: var(--font-jetbrains);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+/* Button system */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 150ms ease;
+  cursor: pointer;
+  height: 2.5rem;
+  padding: 0 1rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 0 20px -4px var(--accent);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text);
+  border: none;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--border);
+  opacity: 0.9;
+}
+.dark .btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text);
+}
+.dark .btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Table system - Frameless & Sleek (WoW Style) */
+.table-container {
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  border: none;
+  box-shadow: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  background: var(--bg);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+}
+
+.dark th {
+  background: var(--bg);
+}
+
+td {
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  transition: all 150ms ease;
+  color: var(--text);
+  border-bottom: none;
+}
+
+tr {
+  background: var(--bg-secondary);
+}
+
+/* Zebra striping - clean separation without lines */
+tr:nth-child(even) {
+  background: var(--bg-tertiary);
+}
+
+tr:hover {
+  background: var(--bg-tertiary) !important;
+}
+
+.dark tr:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Ensure sticky columns have correct background */
+td.sticky {
+  background: inherit;
+}
+
+
+/* Zebra striping - clean separation without lines */
+tr:nth-child(even) td {
+  background: var(--bg-tertiary);
+}
+
+tr:hover td {
+  background: var(--bg-tertiary) !important;
+}
+
+.dark tr:hover td {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Custom scrollbar for tables */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

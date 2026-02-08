@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Better Auth models
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+  guilds   Guild[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verifications")
+}
+
+// ============================================================================
+// Guild models
+// ============================================================================
+
+model Guild {
+  id                     String    @id @default(cuid())
+  name                   String
+  realm                  String
+  region                 String
+  syncEnabled            Boolean   @default(true)
+  discoveryIntervalHours Int       @default(6)
+  activeSyncIntervalMin  Int       @default(30)
+  activityWindowDays     Int       @default(30)
+  memberCount            Int       @default(0)
+  lastDiscoveryAt        DateTime?
+  lastActiveSyncAt       DateTime?
+  userId                 String
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members    GuildMember[]
+  syncJobs   SyncJob[]
+  syncErrors SyncError[]
+  syncLogs   SyncLog[]
+
+  @@unique([name, realm, region])
+  @@index([userId])
+  @@map("guilds")
+}
+
+// ============================================================================
+// Sync data models
+// ============================================================================
+
+model GuildMember {
+  id                     Int       @id @default(autoincrement())
+  guildId                String
+  characterName          String
+  realm                  String
+  characterClass         String?
+  level                  Int?
+  itemLevel              Float?
+  mythicPlusScore        Float?
+  currentSeason          String?
+  pvp2v2Rating           Int       @default(0)
+  pvp3v3Rating           Int       @default(0)
+  pvpRbgRating           Int       @default(0)
+  soloShuffleRating      Int       @default(0)
+  maxSoloShuffleRating   Int       @default(0)
+  rbgShuffleRating       Int       @default(0)
+  achievementPoints      Int       @default(0)
+  raidProgress           String?
+  lastLoginTimestamp     BigInt?
+  activityStatus         String    @default("inactive")
+  lastActivityCheck      DateTime  @default(now())
+  lastHourlyCheck        DateTime?
+  characterApiUrl        String?
+  lastUpdated            DateTime  @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, characterName, realm])
+  @@index([guildId, activityStatus])
+  @@index([guildId, lastLoginTimestamp])
+  @@map("guild_members")
+}
+
+model SyncJob {
+  id               String    @id @default(cuid())
+  guildId          String
+  type             String
+  status           String    @default("pending")
+  bullmqJobId      String?
+  totalItems       Int       @default(0)
+  processedItems   Int       @default(0)
+  errorCount       Int       @default(0)
+  currentCharacter String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  duration         Int?
+  errorMessage     String?
+  createdAt        DateTime  @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, status])
+  @@index([guildId, createdAt])
+  @@map("sync_jobs")
+}
+
+model SyncError {
+  id            Int      @id @default(autoincrement())
+  guildId       String
+  characterName String
+  realm         String?
+  errorType     String
+  errorMessage  String
+  service       String
+  urlAttempted  String?
+  timestamp     DateTime @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, timestamp])
+  @@map("sync_errors")
+}
+
+model SyncLog {
+  id            Int      @id @default(autoincrement())
+  guildId       String
+  timestamp     DateTime @default(now())
+  status        String
+  message       String?
+  characterName String?
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("sync_logs")
+}

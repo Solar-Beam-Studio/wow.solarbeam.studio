@@ -20,6 +20,22 @@ volumes/
 # OS
 .DS_Store
 Thumbs.db
+
+# Prisma
 /src/generated/prisma
 
+# Next.js
+.next/
+out/
+
+# Turbo
+.turbo/
+
+# Build
+dist/
+
+# Claude
 /.claude/
+
+# Legacy
+_legacy/

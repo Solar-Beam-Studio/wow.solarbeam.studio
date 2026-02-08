@@ -1,0 +1,147 @@
+import { Worker, type Job } from "bullmq";
+import type { ConnectionOptions } from "bullmq";
+import { prisma } from "@wow/database";
+import { QUEUE_NAMES } from "../queues";
+import type { ExternalApiService } from "../services/external-api.service";
+import type { EventPublisher } from "../services/event-publisher.service";
+
+interface CharacterSyncJobData {
+  guildId: string;
+  characters: Array<{
+    characterName: string;
+    realm: string;
+    characterApiUrl: string | null;
+    characterClass: string | null;
+  }>;
+  syncJobId: string;
+  batchIndex: number;
+  totalBatches: number;
+}
+
+export function createCharacterSyncWorker(
+  connection: ConnectionOptions,
+  externalApi: ExternalApiService,
+  eventPublisher: EventPublisher
+) {
+  return new Worker<CharacterSyncJobData>(
+    QUEUE_NAMES.CHARACTER_SYNC,
+    async (job: Job<CharacterSyncJobData>) => {
+      const { guildId, characters, syncJobId, batchIndex, totalBatches } =
+        job.data;
+
+      console.log(
+        `[CharSync] Batch ${batchIndex + 1}/${totalBatches} for guild ${guildId}: ${characters.length} characters`
+      );
+
+      const guild = await prisma.guild.findUnique({ where: { id: guildId } });
+      if (!guild) return;
+
+      let syncedCount = 0;
+      let errorCount = 0;
+
+      for (let i = 0; i < characters.length; i++) {
+        const char = characters[i];
+
+        try {
+          const data = await externalApi.getMember(
+            char.characterName,
+            char.realm,
+            guild.region,
+            "auto",
+            char.characterApiUrl
+          );
+
+          await prisma.guildMember.update({
+            where: {
+              guildId_characterName_realm: {
+                guildId,
+                characterName: char.characterName,
+                realm: char.realm,
+              },
+            },
+            data: {
+              characterClass: data.characterClass || char.characterClass,
+              itemLevel: data.itemLevel,
+              mythicPlusScore: data.mythicPlusScore,
+              currentSeason: data.currentSeason,
+              pvp2v2Rating: data.pvp2v2Rating,
+              pvp3v3Rating: data.pvp3v3Rating,
+              pvpRbgRating: data.pvpRbgRating,
+              soloShuffleRating: data.soloShuffleRating,
+              maxSoloShuffleRating: data.maxSoloShuffleRating,
+              rbgShuffleRating: data.rbgShuffleRating,
+              achievementPoints: data.achievementPoints,
+              raidProgress: data.raidProgress,
+              lastHourlyCheck: new Date(),
+              lastUpdated: new Date(),
+            },
+          });
+
+          syncedCount++;
+
+          await eventPublisher.publishMemberUpdated(
+            guildId,
+            char.characterName,
+            char.realm,
+            {
+              itemLevel: data.itemLevel,
+              mythicPlusScore: data.mythicPlusScore,
+              achievementPoints: data.achievementPoints,
+              pvp2v2Rating: data.pvp2v2Rating,
+              pvp3v3Rating: data.pvp3v3Rating,
+              pvpRbgRating: data.pvpRbgRating,
+              soloShuffleRating: data.soloShuffleRating,
+              rbgShuffleRating: data.rbgShuffleRating,
+              raidProgress: data.raidProgress,
+            }
+          );
+        } catch (error) {
+          errorCount++;
+          const errorMsg =
+            error instanceof Error ? error.message : String(error);
+
+          await prisma.syncError.create({
+            data: {
+              guildId,
+              characterName: char.characterName,
+              realm: char.realm,
+              errorType: "sync_error",
+              errorMessage: errorMsg,
+              service: "auto",
+            },
+          });
+        }
+
+        // Update sync job progress
+        await prisma.syncJob.update({
+          where: { id: syncJobId },
+          data: {
+            processedItems: { increment: 1 },
+            errorCount: { increment: errorCount > 0 ? 1 : 0 },
+            currentCharacter: char.characterName,
+          },
+        });
+
+        await eventPublisher.publishProgress(
+          guildId,
+          i + 1,
+          characters.length,
+          errorCount,
+          char.characterName
+        );
+
+        // Rate limit: 1s between characters
+        if (i < characters.length - 1) {
+          await new Promise((r) => setTimeout(r, 1000));
+        }
+      }
+
+      console.log(
+        `[CharSync] Batch ${batchIndex + 1} done: ${syncedCount} synced, ${errorCount} errors`
+      );
+
+      return { syncedCount, errorCount };
+    },
+    { connection, concurrency: 2 }
+  );
+}
