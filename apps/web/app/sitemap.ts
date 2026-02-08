@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@wow/database";
 
+export const dynamic = "force-dynamic";
+
 const BASE_URL = "https://wowguilds.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
