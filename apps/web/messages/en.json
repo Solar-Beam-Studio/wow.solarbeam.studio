@@ -103,6 +103,20 @@
     "updated": "Updated",
     "noResults": "No guild members found matching your search."
   },
+  "hallOfFame": {
+    "title": "Hall of Fame",
+    "pveKings": "PvE Kings",
+    "pvpKings": "PvP Kings",
+    "itemLevel": "Item Level King",
+    "mythicPlus": "M+ King",
+    "raids": "Raid King",
+    "achievements": "Achievement King",
+    "pvp2v2": "2v2 Arena",
+    "pvp3v3": "3v3 Arena",
+    "pvpSolo": "Solo Shuffle",
+    "pvpRbg": "RBG",
+    "pvpBlitz": "Blitz"
+  },
   "sidebar": {
     "navigation": "Navigation",
     "explore": "Explore",

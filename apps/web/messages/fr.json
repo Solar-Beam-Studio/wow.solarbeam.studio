@@ -103,6 +103,20 @@
     "updated": "Mis à jour",
     "noResults": "Aucun membre de guilde ne correspond à votre recherche."
   },
+  "hallOfFame": {
+    "title": "Hall of Fame",
+    "pveKings": "Rois du PvE",
+    "pvpKings": "Rois du PvP",
+    "itemLevel": "Roi du iLvl",
+    "mythicPlus": "Roi du M+",
+    "raids": "Roi des Raids",
+    "achievements": "Roi des Hauts Faits",
+    "pvp2v2": "Arène 2v2",
+    "pvp3v3": "Arène 3v3",
+    "pvpSolo": "Solo Shuffle",
+    "pvpRbg": "RBG",
+    "pvpBlitz": "Blitz"
+  },
   "sidebar": {
     "navigation": "Navigation",
     "explore": "Explorer",
