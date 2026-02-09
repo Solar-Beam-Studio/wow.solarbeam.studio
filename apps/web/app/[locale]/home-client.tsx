@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { DataTable, type Column } from "@/components/data-table";
-import { Activity, Users, ArrowRight, BarChart3, Plus, Search, ShieldCheck, Timer } from "lucide-react";
+import { Activity, Users, ArrowRight, Plus, Search, ShieldCheck, Timer } from "lucide-react";
 import { CLASS_COLORS, getItemLevelColor, getMythicPlusColor } from "@wow/database/constants";
 
 interface Guild {
@@ -122,7 +122,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
 
       <main className="grow bg-[var(--bg-secondary)] rounded-2xl overflow-y-auto relative scroll-smooth">
         {/* Global Search & Stats Header */}
-        <div className="p-4 md:p-6 lg:p-8 space-y-8">
+        <div className="p-4 md:p-6 lg:p-8 space-y-8 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl font-display font-black tracking-tight mb-2">{t("heading")}</h1>
@@ -143,7 +143,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
 
           {/* New Dashboard Hero */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-accent to-accent-hover rounded-[2rem] p-8 text-white shadow-2xl shadow-accent/20">
+            <div className="lg:col-span-2 relative overflow-hidden rounded-[2rem] p-8 text-white shadow-2xl shadow-accent/20 bg-accent/80 backdrop-blur-sm">
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/10 backdrop-blur-sm">
                   <Activity className="w-3 h-3" /> {t("liveDataStream")}
@@ -162,9 +162,6 @@ export function HomeClient({ guilds, totalMembers, activeMembers, topCharacters 
                     {t("memberLogin")}
                   </Link>
                 </div>
-              </div>
-              <div className="absolute right-[-5%] top-[-10%] opacity-10 pointer-events-none rotate-12">
-                <BarChart3 className="w-64 h-64" />
               </div>
             </div>
 
