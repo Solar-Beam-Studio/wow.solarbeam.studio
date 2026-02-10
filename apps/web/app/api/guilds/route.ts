@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, Prisma } from "@wow/database";
-import { requireSession } from "@/lib/session";
 import {
   enqueueImmediateDiscovery,
   registerGuildSchedules,
@@ -21,33 +20,6 @@ function isRateLimited(ip: string): boolean {
   }
   entry.count++;
   return entry.count > RATE_LIMIT;
-}
-
-// GET — auth-protected, returns user's guilds (for /guilds dashboard)
-export async function GET() {
-  try {
-    const session = await requireSession();
-
-    const guilds = await prisma.guild.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        _count: {
-          select: { members: true },
-        },
-      },
-    });
-
-    return NextResponse.json(guilds);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    return NextResponse.json(
-      { error: "Failed to fetch guilds" },
-      { status: 500 }
-    );
-  }
 }
 
 // POST — public lookup-or-create
@@ -81,12 +53,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid region" }, { status: 400 });
     }
 
-    const normalizedRealm = realm.toLowerCase();
-    const normalizedRegion = region.toLowerCase();
+    const normalizedRealm = realm.trim().toLowerCase();
+    const normalizedRegion = region.trim().toLowerCase();
 
-    // Lookup existing guild
-    const existing = await prisma.guild.findUnique({
-      where: { name_realm_region: { name, realm: normalizedRealm, region: normalizedRegion } },
+    // Case-insensitive lookup to prevent duplicates
+    const existing = await prisma.guild.findFirst({
+      where: {
+        name: { equals: name.trim(), mode: "insensitive" },
+        realm: normalizedRealm,
+        region: normalizedRegion,
+      },
     });
 
     if (existing) {
@@ -94,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate guild exists on Blizzard before creating
-    const { exists, crest } = await validateGuildExists(name, normalizedRealm, normalizedRegion);
+    const { exists, crest, name: canonicalName } = await validateGuildExists(name, normalizedRealm, normalizedRegion);
     if (!exists) {
       return NextResponse.json(
         { error: "Guild not found on Blizzard. Check the name, realm, and region." },
@@ -102,11 +78,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new guild (no userId — public lookup)
+    // Use Blizzard's canonical name, fallback to user input
+    const guildName = canonicalName || name.trim();
+
+    // Create new guild (public — no userId)
     try {
       const guild = await prisma.guild.create({
         data: {
-          name,
+          name: guildName,
           realm: normalizedRealm,
           region: normalizedRegion,
           crestEmblemId: crest.emblemId,
@@ -131,8 +110,12 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       // P2002 race condition: another request created it first
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-        const existing = await prisma.guild.findUnique({
-          where: { name_realm_region: { name, realm: normalizedRealm, region: normalizedRegion } },
+        const existing = await prisma.guild.findFirst({
+          where: {
+            name: { equals: guildName, mode: "insensitive" },
+            realm: normalizedRealm,
+            region: normalizedRegion,
+          },
         });
         if (existing) {
           return NextResponse.json(existing);

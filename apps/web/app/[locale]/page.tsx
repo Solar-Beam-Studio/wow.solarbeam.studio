@@ -29,7 +29,7 @@ export default async function HomePage({
       prisma.syncJob.findMany({
         where: { status: "completed" },
         orderBy: { completedAt: "desc" },
-        take: 5,
+        take: 20,
         select: {
           id: true,
           type: true,
@@ -71,7 +71,15 @@ export default async function HomePage({
       }),
     ]);
 
-  const recentActivity = recentSyncJobs.map((job) => ({
+  // Deduplicate: keep only the latest sync job per guild
+  const seenGuilds = new Set<string>();
+  const uniqueSyncJobs = recentSyncJobs.filter((job) => {
+    if (seenGuilds.has(job.guild.id)) return false;
+    seenGuilds.add(job.guild.id);
+    return true;
+  }).slice(0, 5);
+
+  const recentActivity = uniqueSyncJobs.map((job) => ({
     id: job.id,
     type: job.type,
     totalItems: job.totalItems,
