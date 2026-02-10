@@ -36,9 +36,6 @@ export async function generateMetadata({
   };
 }
 
-// Always dark mode
-const themeScript = `document.documentElement.classList.add("dark")`;
-
 export default async function RootLayout({
   children,
   params,
@@ -57,11 +54,8 @@ export default async function RootLayout({
   const messages = (await import(`../../messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        {/* Theme init — static constant string, safe to inline */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang={locale} className="dark">
+      <head />
       <body className={`${inter.className} ${rajdhani.variable} ${jetbrainsMono.variable} min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
