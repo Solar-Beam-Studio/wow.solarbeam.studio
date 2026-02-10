@@ -45,11 +45,15 @@ function eventLabel(item: FeedItem): string {
   const data = item.data || {};
   switch (item.type) {
     case "discovery:complete":
-    case "discovery":
-      return `${data.total || data.processedItems || "?"} members discovered`;
+    case "discovery": {
+      const count = data.total || data.processedItems || 0;
+      return `Roster synced · ${count} members`;
+    }
     case "sync:complete":
-    case "active_sync":
-      return `${data.synced || data.processedItems || "?"} characters synced`;
+    case "active_sync": {
+      const count = data.synced || data.processedItems || 0;
+      return `Stats updated · ${count} characters`;
+    }
     case "member:updated":
       return `${data.characterName || "Character"} updated`;
     default:

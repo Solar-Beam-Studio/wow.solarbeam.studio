@@ -68,11 +68,13 @@ export function HomeClient({ guilds, totalMembers, activeMembers, leaderboardCat
 
         <div className="p-4 md:p-6 lg:p-8 space-y-10">
           {/* Hero: Google-style centered search */}
-          <section className="flex flex-col items-center justify-center py-8 md:py-14 text-center">
-            <h1 className="text-3xl md:text-4xl font-display font-black tracking-tight leading-tight">
+          <section className="flex flex-col items-center justify-center py-10 md:py-20 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.1] max-w-2xl">
               {t("tagline")}
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-3 leading-relaxed max-w-md">
+            <p className="text-base text-[var(--text-secondary)] mt-5 leading-relaxed max-w-lg">
               {t("subtitle")}
             </p>
 

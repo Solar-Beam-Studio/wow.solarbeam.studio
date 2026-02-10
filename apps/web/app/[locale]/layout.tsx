@@ -36,8 +36,8 @@ export async function generateMetadata({
   };
 }
 
-// Inline script to prevent flash of wrong theme — static string constant, no user input
-const themeScript = `(function(){var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme:dark)").matches;if(d)document.documentElement.classList.add("dark")})()`;
+// Always dark mode
+const themeScript = `document.documentElement.classList.add("dark")`;
 
 export default async function RootLayout({
   children,
@@ -66,7 +66,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             {children}
-            <Toaster theme="system" />
+            <Toaster theme="dark" />
           </Providers>
         </NextIntlClientProvider>
       </body>

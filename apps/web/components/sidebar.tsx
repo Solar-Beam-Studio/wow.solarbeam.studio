@@ -3,17 +3,15 @@
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
-import { useTheme } from "@/hooks/use-theme";
 import { AppLogo } from "@/components/app-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { Sun, Moon, Zap, LogOut } from "lucide-react";
+import { Zap, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const { dark, toggle } = useTheme();
   const isLoggedIn = !!session?.user;
   const t = useTranslations("sidebar");
 
@@ -36,16 +34,7 @@ export function Sidebar() {
       <div className="bg-[var(--bg-secondary)] rounded-2xl p-3 flex flex-col h-full overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <AppLogo href="/" />
-          <div className="flex items-center gap-1">
-            <LanguageSwitcher />
-            <button
-              onClick={toggle}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
-              title={t("toggleTheme")}
-            >
-              {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-          </div>
+          <LanguageSwitcher />
         </div>
 
         {/* Navigation */}
