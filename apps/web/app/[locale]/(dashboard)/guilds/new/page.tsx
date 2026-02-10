@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useCreateGuild } from "@/hooks/use-guilds";
 import { toast } from "sonner";
+import { guildPath } from "@/lib/guild-url";
 
 export default function NewGuildPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function NewGuildPage() {
       {
         onSuccess: (guild) => {
           toast.success(t("successToast", { name }));
-          router.push(`/g/${guild.id}`);
+          router.push(guildPath(guild));
         },
       }
     );

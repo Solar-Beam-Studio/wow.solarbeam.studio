@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@wow/database";
+import { guildPath } from "@/lib/guild-url";
 
 export const dynamic = "force-dynamic";
 
@@ -20,19 +21,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const guilds = await prisma.guild.findMany({
-    select: { id: true, updatedAt: true },
+    select: { name: true, realm: true, region: true, updatedAt: true },
   });
 
-  const guildEntries: MetadataRoute.Sitemap = guilds.map((guild) => ({
-    url: `${BASE_URL}/g/${guild.id}`,
-    lastModified: guild.updatedAt,
-    alternates: {
-      languages: {
-        en: `${BASE_URL}/g/${guild.id}`,
-        fr: `${BASE_URL}/fr/g/${guild.id}`,
+  const guildEntries: MetadataRoute.Sitemap = guilds.map((guild) => {
+    const path = guildPath(guild);
+    return {
+      url: `${BASE_URL}${path}`,
+      lastModified: guild.updatedAt,
+      alternates: {
+        languages: {
+          en: `${BASE_URL}${path}`,
+          fr: `${BASE_URL}/fr${path}`,
+        },
       },
-    },
-  }));
+    };
+  });
 
   return [...staticEntries, ...guildEntries];
 }

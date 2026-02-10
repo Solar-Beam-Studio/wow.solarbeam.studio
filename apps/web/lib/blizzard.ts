@@ -87,9 +87,9 @@ export async function validateGuildExists(
   guildName: string,
   realm: string,
   region: string
-): Promise<{ exists: boolean; crest: GuildCrest }> {
+): Promise<{ exists: boolean; crest: GuildCrest; name: string | null }> {
   const empty: GuildCrest = { emblemId: null, emblemColor: null, borderId: null, borderColor: null, bgColor: null };
-  if (!VALID_REGIONS.includes(region)) return { exists: false, crest: empty };
+  if (!VALID_REGIONS.includes(region)) return { exists: false, crest: empty, name: null };
 
   const token = await getBlizzardToken();
   const slug = encodeURIComponent(guildName.toLowerCase().replace(/\s+/g, "-"));
@@ -101,10 +101,11 @@ export async function validateGuildExists(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!response.ok) return { exists: false, crest: empty };
+  if (!response.ok) return { exists: false, crest: empty, name: null };
 
   try {
     const data = (await response.json()) as {
+      name?: string;
       crest?: {
         emblem?: { id?: number; color?: { rgba?: { r: number; g: number; b: number; a: number } } };
         border?: { id?: number; color?: { rgba?: { r: number; g: number; b: number; a: number } } };
@@ -118,6 +119,7 @@ export async function validateGuildExists(
 
     return {
       exists: true,
+      name: data.name ?? null,
       crest: c ? {
         emblemId: c.emblem?.id ?? null,
         emblemColor: rgba(c.emblem?.color?.rgba),
@@ -127,6 +129,6 @@ export async function validateGuildExists(
       } : empty,
     };
   } catch {
-    return { exists: true, crest: empty };
+    return { exists: true, crest: empty, name: null };
   }
 }

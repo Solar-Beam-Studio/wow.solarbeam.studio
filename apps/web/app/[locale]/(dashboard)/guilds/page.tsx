@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useGuilds, useDeleteGuild } from "@/hooks/use-guilds";
 import { Plus, Trash2, ExternalLink, AlertCircle } from "lucide-react";
+import { guildPath } from "@/lib/guild-url";
 
 export default function GuildsPage() {
   const { data: guilds, isLoading } = useGuilds();
@@ -51,7 +52,7 @@ export default function GuildsPage() {
               key={guild.id}
               className="group flex items-center justify-between bg-[var(--bg-secondary)] border border-[var(--border)] rounded-2xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
-              <Link href={`/g/${guild.id}`} className="flex items-center gap-4 flex-1 min-w-0">
+              <Link href={guildPath(guild)} className="flex items-center gap-4 flex-1 min-w-0">
                 <div className="w-12 h-12 rounded-2xl bg-[var(--bg-tertiary)] flex items-center justify-center text-accent font-black text-lg border border-[var(--border)] group-hover:bg-accent group-hover:text-white transition-all shrink-0">
                   {guild.name[0]}
                 </div>
@@ -65,7 +66,7 @@ export default function GuildsPage() {
 
               <div className="flex items-center gap-2 shrink-0 ml-4">
                 <Link
-                  href={`/g/${guild.id}`}
+                  href={guildPath(guild)}
                   className="h-9 px-4 bg-accent text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm shadow-accent/10 hover:bg-accent-hover"
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> {t("viewRoster")}

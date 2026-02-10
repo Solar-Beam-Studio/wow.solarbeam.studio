@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { GuildCrest } from "@/components/guild-crest";
 import { Footer } from "@/components/footer";
 import { Eye, Activity, Users, Clock, History } from "lucide-react";
+import { guildPath } from "@/lib/guild-url";
 
 interface ActivityItem {
   id: string;
@@ -149,7 +150,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
               {[...recentActivity.slice(0, 5), ...recentActivity.slice(0, 5)].map((item, i) => (
                 <Link
                   key={`${item.id}-${i}`}
-                  href={`/g/${item.guildId}`}
+                  href={guildPath({ name: item.guildName, realm: item.guildRealm, region: item.guildRegion })}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group shrink-0"
                 >
                   <GuildCrest
@@ -188,7 +189,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
               {recentSearches.map((s) => (
                 <Link
                   key={s.id}
-                  href={`/g/${s.id}`}
+                  href={guildPath(s)}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group"
                 >
                   <span className="text-xs font-bold group-hover:text-violet-400 transition-colors">
@@ -216,7 +217,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
               {recentGuilds.map((g) => (
                 <Link
                   key={g.id}
-                  href={`/g/${g.id}`}
+                  href={guildPath(g)}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group"
                 >
                   <GuildCrest

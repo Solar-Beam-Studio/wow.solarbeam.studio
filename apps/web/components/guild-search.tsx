@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Search, Loader2, Globe, X, History, ArrowRight, ChevronDown } from "lucide-react";
+import { guildPath } from "@/lib/guild-url";
 
 interface Realm {
   name: string;
@@ -187,7 +188,7 @@ export function GuildSearch() {
   function selectSuggestion(g: GuildSuggestion | RecentSearch) {
     setSuggestionsOpen(false);
     addToRecent({ id: g.id, name: g.name, realm: g.realm, region: g.region });
-    router.push(`/g/${g.id}`);
+    router.push(guildPath(g));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -217,7 +218,7 @@ export function GuildSearch() {
 
       const guild = await res.json();
       addToRecent({ id: guild.id, name: guild.name, realm: guild.realm, region: guild.region });
-      router.push(`/g/${guild.id}`);
+      router.push(guildPath(guild));
     } catch {
       setError("Network error");
     } finally {

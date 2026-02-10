@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@/i18n/navigation";
 import { Radio, Radar } from "lucide-react";
+import { guildPath } from "@/lib/guild-url";
 import { GuildCrest } from "@/components/guild-crest";
 
 interface SeedItem {
@@ -171,7 +172,9 @@ export function ActivitySidebar({ seed }: { seed: SeedItem[] }) {
           items.map((item) => (
             <Link
               key={item.id}
-              href={`/g/${item.guildId}`}
+              href={item.guildName && item.guildRealm && item.guildRegion
+                ? guildPath({ name: item.guildName, realm: item.guildRealm, region: item.guildRegion })
+                : `/g/${item.guildId}`}
               className={`flex items-start gap-3.5 p-4 rounded-2xl transition-all group hover:bg-white/[0.03] border border-transparent hover:border-white/5 ${
                 item.isLive ? "animate-in fade-in slide-in-from-top-1 duration-300" : ""
               }`}
