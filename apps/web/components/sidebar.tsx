@@ -31,22 +31,25 @@ export function Sidebar() {
 
   return (
     <aside className="w-full md:w-64 flex flex-col gap-1.5 shrink-0">
-      <div className="bg-[var(--bg-secondary)] rounded-2xl p-3 flex flex-col h-full overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <AppLogo href="/" />
-          <LanguageSwitcher />
+      <div className="bg-[var(--bg-secondary)] rounded-2xl p-3 flex flex-col h-full overflow-y-auto border border-[var(--border)] shadow-sm">
+        <div className="flex items-center mb-8">
+          <AppLogo href="/" className="px-1" />
         </div>
 
         {/* Navigation */}
         <div className="flex flex-col gap-8 grow">
           <section className="flex flex-col gap-1.5">
-            <p className="px-4 text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-2">{t("navigation")}</p>
+            <p className="px-3 text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-2 opacity-50">{t("navigation")}</p>
             {navLink("/", t("explore"), <Zap className="w-4 h-4" />, pathname === "/")}
           </section>
         </div>
 
         {/* Footer */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-6 flex flex-col gap-4">
+          <div className="px-1">
+            <LanguageSwitcher />
+          </div>
+          
           {isLoggedIn ? (
             <div className="flex items-center gap-3 p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border)] group">
               <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white font-bold shrink-0 text-sm shadow-sm shadow-accent/20">

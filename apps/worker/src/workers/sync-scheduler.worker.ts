@@ -30,6 +30,17 @@ export function createSyncSchedulerWorker(
       const guild = await prisma.guild.findUnique({ where: { id: guildId } });
       if (!guild || !guild.syncEnabled) return;
 
+      // Clean up stale "running" sync jobs older than 1 hour (from pre-fix or crashed batches)
+      await prisma.syncJob.updateMany({
+        where: {
+          guildId,
+          type: "active_sync",
+          status: "running",
+          startedAt: { lt: new Date(Date.now() - 60 * 60 * 1000) },
+        },
+        data: { status: "failed", errorMessage: "Timed out (stale)", completedAt: new Date() },
+      });
+
       // Get active characters (within activity window)
       const cutoffTimestamp =
         Date.now() - guild.activityWindowDays * 24 * 60 * 60 * 1000;

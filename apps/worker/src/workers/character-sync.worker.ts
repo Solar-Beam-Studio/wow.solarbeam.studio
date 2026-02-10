@@ -45,6 +45,7 @@ export function createCharacterSyncWorker(
 
       for (let i = 0; i < characters.length; i++) {
         const char = characters[i];
+        let hadError = false;
 
         try {
           const data = await externalApi.getMember(
@@ -82,27 +83,10 @@ export function createCharacterSyncWorker(
           });
 
           syncedCount++;
-
-          await eventPublisher.publishMemberUpdated(
-            guildId,
-            char.characterName,
-            char.realm,
-            {
-              itemLevel: data.itemLevel,
-              mythicPlusScore: data.mythicPlusScore,
-              achievementPoints: data.achievementPoints,
-              pvp2v2Rating: data.pvp2v2Rating,
-              pvp3v3Rating: data.pvp3v3Rating,
-              pvpRbgRating: data.pvpRbgRating,
-              soloShuffleRating: data.soloShuffleRating,
-              rbgShuffleRating: data.rbgShuffleRating,
-              raidProgress: data.raidProgress,
-            }
-          );
         } catch (error) {
+          hadError = true;
           errorCount++;
           const rawMsg = error instanceof Error ? error.message : String(error);
-          // Sanitize: strip tokens/URLs, truncate
           const errorMsg = rawMsg.replace(/Bearer\s+\S+/g, "Bearer [REDACTED]").slice(0, 500);
 
           await prisma.syncError.create({
@@ -122,18 +106,21 @@ export function createCharacterSyncWorker(
           where: { id: syncJobId },
           data: {
             processedItems: { increment: 1 },
-            errorCount: { increment: errorCount > 0 ? 1 : 0 },
+            errorCount: { increment: hadError ? 1 : 0 },
             currentCharacter: char.characterName,
           },
         });
 
-        await eventPublisher.publishProgress(
-          guildId,
-          i + 1,
-          characters.length,
-          errorCount,
-          char.characterName
-        );
+        // Publish progress every 10 characters (reduces Redis noise)
+        if ((i + 1) % 10 === 0 || i === characters.length - 1) {
+          await eventPublisher.publishProgress(
+            guildId,
+            i + 1,
+            characters.length,
+            errorCount,
+            char.characterName
+          );
+        }
 
         // Rate limit: 1s between characters
         if (i < characters.length - 1) {
@@ -144,6 +131,37 @@ export function createCharacterSyncWorker(
       console.log(
         `[CharSync] Batch ${batchIndex + 1} done: ${syncedCount} synced, ${errorCount} errors`
       );
+
+      // Check if all batches are done → mark SyncJob completed + publish event
+      const syncJobState = await prisma.syncJob.findUnique({
+        where: { id: syncJobId },
+        select: { processedItems: true, totalItems: true, startedAt: true, errorCount: true },
+      });
+
+      if (syncJobState && syncJobState.processedItems >= syncJobState.totalItems) {
+        const duration = Math.round(
+          (Date.now() - (syncJobState.startedAt?.getTime() ?? Date.now())) / 1000
+        );
+
+        // Atomically mark completed (only one batch wins the race)
+        const updated = await prisma.syncJob.updateMany({
+          where: { id: syncJobId, status: "running" },
+          data: { status: "completed", completedAt: new Date(), duration },
+        });
+
+        if (updated.count > 0) {
+          await eventPublisher.publishComplete(
+            guildId,
+            syncJobState.processedItems,
+            syncJobState.errorCount,
+            duration,
+            "active_sync"
+          );
+          console.log(
+            `[CharSync] All batches complete for guild ${guild.name}: ${syncJobState.processedItems} characters (${duration}s)`
+          );
+        }
+      }
 
       return { syncedCount, errorCount };
     },
