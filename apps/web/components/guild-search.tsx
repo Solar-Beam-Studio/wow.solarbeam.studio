@@ -284,7 +284,7 @@ export function GuildSearch() {
               />
             </div>
             {realmOpen && realmFiltered.length > 0 && (
-              <div className="absolute left-0 top-[calc(100%+16px)] w-64 bg-[#111113]/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2 transition-all duration-200 ease-out">
+              <div className="absolute left-0 top-[calc(100%+16px)] w-64 bg-[#111113] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2 transition-all duration-200 ease-out">
                 <div className="max-h-64 overflow-y-auto space-y-1">
                   {realmFiltered.map((r) => (
                     <button
@@ -328,7 +328,7 @@ export function GuildSearch() {
 
             {mounted && regionOpen && createPortal(
               <div
-                className="fixed z-[9999] w-40 bg-[#111113]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                className="fixed z-[9999] w-40 bg-[#111113] border border-white/10 rounded-2xl shadow-2xl p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                 style={{ top: regionMenuPos.top, left: regionMenuPos.left }}
               >
                 <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5 mb-1">
@@ -382,7 +382,7 @@ export function GuildSearch() {
 
       {/* Suggestions dropdown — full width of search bar */}
       {(suggestionsOpen && (suggestions.length > 0 || (recentSearches.length > 0 && !guildName))) && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-[#111113]/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden transition-all duration-200 ease-out">
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-[#111113] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden transition-all duration-200 ease-out">
           {!guildName && (
             <div className="p-2 border-b border-white/5 bg-white/[0.02]">
               <p className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
