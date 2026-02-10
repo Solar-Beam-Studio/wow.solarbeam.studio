@@ -46,27 +46,27 @@ export function GuildCrest({
   }
 
   const borderUrl = borderId ? BORDER_URL(borderId) : null;
+  const maskProps = (url: string) => ({
+    maskImage: `url(${url})`,
+    WebkitMaskImage: `url(${url})`,
+    maskSize: "contain",
+    WebkitMaskSize: "contain",
+    maskRepeat: "no-repeat",
+    WebkitMaskRepeat: "no-repeat",
+    maskPosition: "center",
+    WebkitMaskPosition: "center",
+  } as const);
 
   return (
     <div
       className={`relative shrink-0 ${className}`}
       style={{ width: size, height: size }}
     >
-      {/* Background — clipped to border shape */}
+      {/* Base fill — clipped to border shape */}
       {borderUrl ? (
         <div
           className="absolute inset-0"
-          style={{
-            backgroundColor: parseColor(bgColor),
-            maskImage: `url(${borderUrl})`,
-            WebkitMaskImage: `url(${borderUrl})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-          }}
+          style={{ backgroundColor: parseColor(bgColor), ...maskProps(borderUrl) }}
         />
       ) : (
         <div
@@ -75,39 +75,11 @@ export function GuildCrest({
         />
       )}
 
-      {/* Border */}
-      {borderId && (
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: parseColor(borderColor),
-            maskImage: `url(${BORDER_URL(borderId)})`,
-            WebkitMaskImage: `url(${BORDER_URL(borderId)})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-          }}
-        />
-      )}
-
       {/* Emblem */}
       {emblemId && (
         <div
           className="absolute inset-[15%]"
-          style={{
-            backgroundColor: parseColor(emblemColor),
-            maskImage: `url(${EMBLEM_URL(emblemId)})`,
-            WebkitMaskImage: `url(${EMBLEM_URL(emblemId)})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-          }}
+          style={{ backgroundColor: parseColor(emblemColor), ...maskProps(EMBLEM_URL(emblemId)) }}
         />
       )}
     </div>
