@@ -56,7 +56,12 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="dark">
       <head />
-      <body className={`${inter.className} ${rajdhani.variable} ${jetbrainsMono.variable} min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased`}>
+      <body className={`${inter.className} ${rajdhani.variable} ${jetbrainsMono.variable} min-h-screen bg-[#0b0b0d] text-white antialiased`}>
+        {/* Background image — visible at top, fades to solid at bottom */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <img src="/hero.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(11,11,13,0.6) 0%, rgba(11,11,13,0.85) 40%, rgba(11,11,13,1) 70%)" }} />
+        </div>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             {children}

@@ -3,14 +3,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #030303;
-  --bg-secondary: #0f0f0f;
-  --bg-tertiary: #1a1a1a;
+  --bg: #0b0b0d;
+  --bg-secondary: #111113;
+  --bg-tertiary: #1a1a1d;
   --text: #ffffff;
-  --text-secondary: #94a3b8;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: #1a1a1a;
-  --accent: #5865F2;
+  --text-secondary: #9ca3af;
+  --border: rgba(255, 255, 255, 0.05);
+  --input: #1a1a1d;
+  --accent: #7c3aed;
   --accent-foreground: #ffffff;
 }
 
@@ -21,6 +21,13 @@
   --color-accent-foreground: var(--accent-foreground);
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
+}
+
+/* Glass morphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Button system */
@@ -163,16 +170,12 @@ tr:hover td {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0b0b0d;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: #2a2a2d;
   border-radius: 10px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -185,4 +188,17 @@ tr:hover td {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Stock ticker animation */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@utility animate-ticker {
+  animation: ticker 25s linear infinite;
+  &:hover {
+    animation-play-state: paused;
+  }
 }

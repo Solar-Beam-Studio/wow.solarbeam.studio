@@ -1,13 +1,8 @@
 "use client";
 
 import { CLASS_COLORS } from "@wow/database/constants";
+import { ShieldCheck } from "lucide-react";
 import type { LeaderboardCategory } from "@/lib/leaderboard";
-
-const MEDAL_STYLES = [
-  "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", // gold
-  "bg-zinc-400/15 text-zinc-300 border-zinc-400/30", // silver
-  "bg-amber-700/20 text-amber-500 border-amber-700/30", // bronze
-];
 
 export function LeaderboardCard({
   category,
@@ -19,19 +14,21 @@ export function LeaderboardCard({
   showGuild?: boolean;
 }) {
   return (
-    <div
-      className="bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--border)] p-5"
-    >
-      <div className="flex items-center gap-2 mb-4">
+    <div className="glass rounded-3xl p-6 border border-white/5 hover:border-violet-500/20 transition-all relative overflow-hidden group">
+      <div className="flex items-center gap-2 mb-5">
         <span className="text-lg">{category.icon}</span>
-        <h3 className="text-sm font-bold tracking-tight">{translatedName}</h3>
+        <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">{translatedName}</h3>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {category.entries.map((entry, i) => (
-          <div key={entry.name} className="flex items-center gap-3">
+          <div key={`${entry.name}-${i}`} className="flex items-center gap-3">
             <span
-              className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold border ${MEDAL_STYLES[i]}`}
+              className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-[10px] font-bold border ${
+                i === 0
+                  ? "bg-violet-500 border-violet-400 text-white"
+                  : "bg-white/5 border-white/10 text-gray-500"
+              }`}
             >
               {i + 1}
             </span>
@@ -48,18 +45,21 @@ export function LeaderboardCard({
                 {entry.name}
               </p>
               {showGuild && entry.guildName && (
-                <p className="text-[10px] text-[var(--text-secondary)] truncate">
+                <p className="text-[10px] text-gray-500 truncate">
                   {entry.guildName}
                 </p>
               )}
             </div>
-            <span
-              className={`text-xs font-mono font-bold tabular-nums ${entry.colorClass}`}
-            >
+            <span className="text-sm font-black italic tracking-tighter text-white tabular-nums">
               {entry.value}
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Decorative shield */}
+      <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+        <ShieldCheck className="w-24 h-24" />
       </div>
     </div>
   );

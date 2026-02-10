@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@/i18n/navigation";
-import { Radio } from "lucide-react";
+import { Radio, Radar } from "lucide-react";
 import { GuildCrest } from "@/components/guild-crest";
 
 interface SeedItem {
@@ -145,62 +145,76 @@ export function ActivitySidebar({ seed }: { seed: SeedItem[] }) {
   }, []);
 
   return (
-    <aside className="w-full md:w-56 lg:w-64 shrink-0 hidden lg:block">
-      <div className="bg-[var(--bg-secondary)] rounded-2xl p-3 flex flex-col h-full overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center gap-2 px-2 mb-3">
+    <aside className="w-[380px] shrink-0 hidden xl:flex flex-col border-l border-white/5 bg-[#0b0b0d]/40 backdrop-blur-3xl h-[calc(100vh-80px)] sticky top-20">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex items-center gap-3">
           <div className="relative">
-            <Radio className="w-3.5 h-3.5 text-green-500" />
+            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
             {connected && (
-              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div className="absolute inset-0 w-2 h-2 rounded-full bg-violet-500 animate-ping" />
             )}
           </div>
-          <h2 className="text-[10px] font-display font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">
+          <h2 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em]">
             Live Activity
           </h2>
         </div>
+      </div>
 
-        {/* Feed */}
-        <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
-          {items.length === 0 ? (
-            <div className="px-2 py-8 text-center">
-              <p className="text-[10px] text-[var(--text-secondary)]">Waiting for sync events...</p>
-            </div>
-          ) : (
-            items.map((item) => (
-              <Link
-                key={item.id}
-                href={`/g/${item.guildId}`}
-                className={`flex items-start gap-2.5 px-2.5 py-2 rounded-xl transition-all group hover:bg-[var(--bg-tertiary)] ${
-                  item.isLive ? "animate-in fade-in slide-in-from-top-1 duration-300" : ""
-                }`}
-              >
-                <GuildCrest
-                  emblemId={item.crestEmblemId ?? null}
-                  emblemColor={item.crestEmblemColor ?? null}
-                  borderId={item.crestBorderId ?? null}
-                  borderColor={item.crestBorderColor ?? null}
-                  bgColor={item.crestBgColor ?? null}
-                  size={28}
-                  className="mt-0.5"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold truncate group-hover:text-accent transition-colors leading-tight">
+      {/* Feed */}
+      <div className="flex-1 overflow-y-auto px-4 space-y-1 min-h-0">
+        {items.length === 0 ? (
+          <div className="px-4 py-12 text-center">
+            <p className="text-xs text-gray-500">Waiting for sync events...</p>
+          </div>
+        ) : (
+          items.map((item) => (
+            <Link
+              key={item.id}
+              href={`/g/${item.guildId}`}
+              className={`flex items-start gap-3.5 p-4 rounded-2xl transition-all group hover:bg-white/[0.03] border border-transparent hover:border-white/5 ${
+                item.isLive ? "animate-in fade-in slide-in-from-top-1 duration-300" : ""
+              }`}
+            >
+              <GuildCrest
+                emblemId={item.crestEmblemId ?? null}
+                emblemColor={item.crestEmblemColor ?? null}
+                borderId={item.crestBorderId ?? null}
+                borderColor={item.crestBorderColor ?? null}
+                bgColor={item.crestBgColor ?? null}
+                size={48}
+                className="rounded-xl shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[15px] font-bold truncate group-hover:text-violet-400 transition-colors leading-tight">
                     {item.guildName || "Unknown Guild"}
                   </p>
-                  <p className="text-[10px] text-[var(--text-secondary)] leading-snug mt-0.5 truncate">
-                    {eventLabel(item)}
-                  </p>
-                  <p className="text-[9px] text-[var(--text-secondary)] opacity-50 mt-0.5">
-                    {item.guildRealm && item.guildRegion
-                      ? `${item.guildRealm}-${item.guildRegion.toUpperCase()} · `
-                      : ""}
+                  <span className="text-[10px] text-gray-500 shrink-0">
                     {timeAgo(item.timestamp)}
-                  </p>
+                  </span>
                 </div>
-              </Link>
-            ))
-          )}
+                <p className="text-[11px] text-gray-500 leading-snug mt-1 truncate">
+                  {eventLabel(item)}
+                </p>
+                {item.guildRealm && item.guildRegion && (
+                  <p className="text-[10px] text-gray-600 mt-0.5">
+                    {item.guildRealm}-{item.guildRegion.toUpperCase()}
+                  </p>
+                )}
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Scanner footer */}
+      <div className="px-6 py-4 border-t border-white/5">
+        <div className="glass rounded-xl px-4 py-3 flex items-center gap-3">
+          <Radar className="w-4 h-4 text-violet-500 animate-spin" style={{ animationDuration: "3s" }} />
+          <p className="text-[11px] text-gray-500 font-medium">
+            Scanning realms for updates...
+          </p>
         </div>
       </div>
     </aside>

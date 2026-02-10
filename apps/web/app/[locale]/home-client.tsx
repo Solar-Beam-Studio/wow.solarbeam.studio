@@ -1,23 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Sidebar } from "@/components/sidebar";
-import { ActivitySidebar } from "@/components/activity-sidebar";
+import { Link } from "@/i18n/navigation";
 import { GuildSearch } from "@/components/guild-search";
-import { LeaderboardGrid } from "@/components/leaderboard-grid";
-import { Trophy, ShieldCheck, Users, Activity, Eye } from "lucide-react";
-import type { LeaderboardCategory } from "@/lib/leaderboard";
-import { CLASS_COLORS } from "@wow/database/constants";
-
-interface Guild {
-  id: string;
-  name: string;
-  realm: string;
-  region: string;
-  memberCount: number;
-  lastActiveSyncAt: Date | null;
-}
+import { AppLogo } from "@/components/app-logo";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { GuildCrest } from "@/components/guild-crest";
+import { Footer } from "@/components/footer";
+import { Eye, Activity, Users, Clock, History } from "lucide-react";
 
 interface ActivityItem {
   id: string;
@@ -37,133 +28,219 @@ interface ActivityItem {
   crestBgColor: string | null;
 }
 
-interface HomeClientProps {
-  guilds: Guild[];
-  totalMembers: number;
-  activeMembers: number;
-  leaderboardCategories: LeaderboardCategory[];
-  recentActivity: ActivityItem[];
+interface RecentGuild {
+  id: string;
+  name: string;
+  realm: string;
+  region: string;
+  memberCount: number;
+  updatedAt: string;
+  crestEmblemId: number | null;
+  crestEmblemColor: string | null;
+  crestBorderId: number | null;
+  crestBorderColor: string | null;
+  crestBgColor: string | null;
 }
 
-export function HomeClient({ guilds, totalMembers, activeMembers, leaderboardCategories, recentActivity }: HomeClientProps) {
-  const t = useTranslations("home");
+interface RecentSearch {
+  id: string;
+  name: string;
+  realm: string;
+  region: string;
+}
 
-  const spotlightCategories = useMemo(() => {
-    return leaderboardCategories.filter(c => ["itemLevel", "mythicPlus", "raids"].includes(c.id));
-  }, [leaderboardCategories]);
+interface HomeClientProps {
+  guilds: { id: string }[];
+  totalMembers: number;
+  activeMembers: number;
+  recentActivity: ActivityItem[];
+  recentGuilds: RecentGuild[];
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const secs = Math.floor(diff / 1000);
+  if (secs < 60) return "just now";
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+function eventLabel(type: string, total: number, processed: number): string {
+  switch (type) {
+    case "discovery:complete":
+    case "discovery":
+      return `Roster synced · ${total || processed} members`;
+    case "sync:complete":
+    case "active_sync":
+      return `Stats updated · ${processed} characters`;
+    default:
+      return "Sync event";
+  }
+}
+
+export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity, recentGuilds }: HomeClientProps) {
+  const t = useTranslations("home");
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("recent_guild_searches");
+      if (saved) setRecentSearches(JSON.parse(saved).slice(0, 5));
+    } catch {}
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] p-1.5 flex flex-col md:flex-row gap-1.5 overflow-hidden max-h-screen">
-      <Sidebar />
-
-      <main className="grow bg-[var(--bg-secondary)] rounded-2xl overflow-y-auto relative scroll-smooth flex flex-col min-w-0">
-        {/* Compact stat bar */}
-        <header className="sticky top-0 z-30 bg-[var(--bg-secondary)]/80 backdrop-blur-xl border-b border-[var(--border)] px-4 py-2.5 md:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-            <span>{guilds.length} {t("verifiedGuilds")}</span>
-            <span className="text-[var(--border)]">/</span>
-            <span>{totalMembers.toLocaleString()} {t("characters")}</span>
-            <span className="text-[var(--border)]">/</span>
+    <div className="min-h-screen text-white relative z-10">
+      {/* Header */}
+      <header className="w-full px-8 py-5 flex items-center justify-between">
+        <AppLogo href="/" mode="full" />
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
+            <span>{guilds.length} guilds</span>
+            <span className="text-white/10">/</span>
+            <span>{totalMembers.toLocaleString()} characters</span>
+            <span className="text-white/10">/</span>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span>{activeMembers.toLocaleString()} {t("activePlayers")}</span>
+              <span>{activeMembers.toLocaleString()} active</span>
             </div>
           </div>
-        </header>
+          <LanguageSwitcher />
+        </div>
+      </header>
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-10">
-          {/* Hero: Google-style centered search */}
-          <section className="flex flex-col items-center justify-center py-10 md:py-20 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.1] max-w-2xl">
-              {t("tagline")}
-            </h1>
-            <p className="text-base text-[var(--text-secondary)] mt-5 leading-relaxed max-w-lg">
-              {t("subtitle")}
-            </p>
+      {/* Hero — Google-style centered search */}
+      <section className="flex flex-col items-center pt-24 md:pt-32 pb-16 text-center px-4">
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-[0.95]">
+          WOW<span className="text-violet-500">GUILDS</span>.COM
+        </h1>
+        <p className="text-base md:text-lg text-gray-400 mt-4 font-medium max-w-md">
+          {t("subtitle")}
+        </p>
 
-            <GuildSearch />
+        <GuildSearch />
 
-            {/* Value props */}
-            <div className="flex flex-wrap justify-center gap-5 mt-6">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-secondary)]">
-                <Eye className="w-3.5 h-3.5 text-accent" />
-                {t("valueProp1")}
-              </div>
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-secondary)]">
-                <Activity className="w-3.5 h-3.5 text-accent" />
-                {t("valueProp2")}
-              </div>
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-secondary)]">
-                <Users className="w-3.5 h-3.5 text-accent" />
-                {t("valueProp3")}
-              </div>
-            </div>
-          </section>
+        {/* Value props */}
+        <div className="flex flex-wrap justify-center gap-6 mt-8">
+          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
+            <Eye className="w-3.5 h-3.5 text-violet-500" />
+            {t("valueProp1")}
+          </div>
+          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
+            <Activity className="w-3.5 h-3.5 text-violet-500" />
+            {t("valueProp2")}
+          </div>
+          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
+            <Users className="w-3.5 h-3.5 text-violet-500" />
+            {t("valueProp3")}
+          </div>
+        </div>
 
-          {/* Top Ranks Spotlight */}
-          <section>
-            <div className="flex items-center justify-between mb-4 px-1">
-              <h2 className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] flex items-center gap-2">
-                <Trophy className="w-3 h-3 text-amber-500" />
-                {t("topRanks")}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {spotlightCategories.map((cat) => (
-                <div key={cat.id} className="relative group overflow-hidden bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-2xl p-5 hover:border-accent/50 transition-all duration-300">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{cat.icon}</span>
-                      <h3 className="text-xs font-bold uppercase tracking-wider">{cat.id === 'itemLevel' ? 'iLvl' : cat.id === 'mythicPlus' ? 'M+' : 'Raids'}</h3>
-                    </div>
-                  </div>
-
-                  {cat.entries.slice(0, 1).map((entry) => (
-                    <div key={entry.name} className="flex flex-col gap-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-display font-black tracking-tight leading-none" style={{ color: (entry.characterClass && CLASS_COLORS[entry.characterClass]) || 'var(--text)' }}>
-                          {entry.value}
-                        </span>
-                        <span className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{cat.id === 'itemLevel' ? 'iLvl' : cat.id === 'mythicPlus' ? 'Score' : 'Progress'}</span>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-accent border border-[var(--border)] font-black text-lg">
-                          {entry.name[0]}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-display font-bold text-lg truncate leading-none mb-1" style={{ color: (entry.characterClass && CLASS_COLORS[entry.characterClass]) || 'var(--text)' }}>
-                            {entry.name}
-                          </p>
-                          <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider truncate">
-                            {entry.guildName}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="absolute -bottom-6 -right-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
-                     <ShieldCheck className="w-32 h-32" />
-                  </div>
-                </div>
+        {/* Recent syncs — stock ticker */}
+        {recentActivity.length > 0 && (
+          <div className="mt-10 w-full max-w-3xl overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}>
+            <div className="flex items-center gap-4 animate-ticker w-max">
+              {/* Duplicate items for seamless loop */}
+              {[...recentActivity.slice(0, 5), ...recentActivity.slice(0, 5)].map((item, i) => (
+                <Link
+                  key={`${item.id}-${i}`}
+                  href={`/g/${item.guildId}`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group shrink-0"
+                >
+                  <GuildCrest
+                    emblemId={item.crestEmblemId}
+                    emblemColor={item.crestEmblemColor}
+                    borderId={item.crestBorderId}
+                    borderColor={item.crestBorderColor}
+                    bgColor={item.crestBgColor}
+                    size={24}
+                  />
+                  <span className="text-xs font-bold group-hover:text-violet-400 transition-colors whitespace-nowrap">
+                    {item.guildName}
+                  </span>
+                  <span className="text-[10px] text-gray-600 whitespace-nowrap">
+                    {eventLabel(item.type, item.totalItems, item.processedItems)}
+                  </span>
+                </Link>
               ))}
             </div>
-          </section>
+          </div>
+        )}
+      </section>
 
-          {/* Hall of Fame: Full Grid */}
-          <section className="pt-8 border-t border-[var(--border)]">
-             <div className="px-1 mb-6">
-                <h2 className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("topRanks")} Detailed</h2>
-             </div>
-             <LeaderboardGrid categories={leaderboardCategories} showGuild />
-          </section>
-        </div>
-      </main>
+      {/* Recently searched + Recently updated */}
+      <section className="max-w-3xl mx-auto px-4 pb-20 space-y-10">
+        {/* Recently Searched (from localStorage) */}
+        {recentSearches.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <History className="w-3.5 h-3.5 text-gray-600" />
+              <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
+                Recently Searched
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {recentSearches.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/g/${s.id}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group"
+                >
+                  <span className="text-xs font-bold group-hover:text-violet-400 transition-colors">
+                    {s.name}
+                  </span>
+                  <span className="text-[10px] text-gray-600">
+                    {s.realm}-{s.region.toUpperCase()}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
-      <ActivitySidebar seed={recentActivity} />
+        {/* Recently Updated (from server) */}
+        {recentGuilds.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-3.5 h-3.5 text-gray-600" />
+              <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
+                Recently Updated
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {recentGuilds.map((g) => (
+                <Link
+                  key={g.id}
+                  href={`/g/${g.id}`}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group"
+                >
+                  <GuildCrest
+                    emblemId={g.crestEmblemId}
+                    emblemColor={g.crestEmblemColor}
+                    borderId={g.crestBorderId}
+                    borderColor={g.crestBorderColor}
+                    bgColor={g.crestBgColor}
+                    size={32}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold group-hover:text-violet-400 transition-colors truncate">
+                      {g.name}
+                    </div>
+                    <div className="text-[10px] text-gray-600">
+                      {g.realm}-{g.region.toUpperCase()} · {g.memberCount} members · {timeAgo(g.updatedAt)}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <Footer />
     </div>
   );
 }

@@ -28,23 +28,23 @@ export function PublicGuildClient({
   return (
     <div>
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-[var(--border)] mb-6">
+      <div className="flex gap-10 border-b border-white/5 mb-8">
         <button
           onClick={() => setTab("leaderboard")}
-          className={`pb-2.5 text-sm font-bold transition-colors ${
+          className={`pb-4 text-sm uppercase transition-colors ${
             tab === "leaderboard"
-              ? "border-b-2 border-accent text-[var(--text)]"
-              : "text-[var(--text-secondary)] hover:text-[var(--text)]"
+              ? "font-black tracking-[0.2em] border-b-2 border-violet-500 text-white"
+              : "font-bold tracking-wider text-gray-600 hover:text-gray-300"
           }`}
         >
           {t("tabLeaderboard")}
         </button>
         <button
           onClick={() => setTab("roster")}
-          className={`pb-2.5 text-sm font-bold transition-colors ${
+          className={`pb-4 text-sm uppercase transition-colors ${
             tab === "roster"
-              ? "border-b-2 border-accent text-[var(--text)]"
-              : "text-[var(--text-secondary)] hover:text-[var(--text)]"
+              ? "font-black tracking-[0.2em] border-b-2 border-violet-500 text-white"
+              : "font-bold tracking-wider text-gray-600 hover:text-gray-300"
           }`}
         >
           {t("tabRoster")}
@@ -56,13 +56,13 @@ export function PublicGuildClient({
       {tab === "roster" && (
         <div>
           <div className="mb-5 relative max-w-sm">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("searchPlaceholder")}
-              className="w-full h-10 pl-11 pr-4 bg-[var(--input)] border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--text)] placeholder:text-[var(--text-secondary)]/50"
+              className="w-full h-10 pl-11 pr-4 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-gray-600"
             />
           </div>
           <MemberTable members={members} region={region} search={search} />
