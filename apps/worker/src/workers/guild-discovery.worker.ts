@@ -163,13 +163,21 @@ export function createGuildDiscoveryWorker(
           );
         }
 
-        // Update guild stats
+        // Step 5: Fetch guild crest
+        const crest = await externalApi.getGuildCrest(guild.name, guild.realm, guild.region);
+
+        // Update guild stats + crest
         const duration = Math.round((Date.now() - startTime) / 1000);
         await prisma.guild.update({
           where: { id: guildId },
           data: {
             lastDiscoveryAt: new Date(),
             memberCount: members.length,
+            crestEmblemId: crest.emblemId,
+            crestEmblemColor: crest.emblemColor,
+            crestBorderId: crest.borderId,
+            crestBorderColor: crest.borderColor,
+            crestBgColor: crest.bgColor,
           },
         });
 

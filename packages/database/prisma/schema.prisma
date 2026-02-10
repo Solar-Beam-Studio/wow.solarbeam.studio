@@ -90,6 +90,11 @@ model Guild {
   lastDiscoveryAt        DateTime?
   lastActiveSyncAt       DateTime?
   userId                 String?
+  crestEmblemId          Int?
+  crestEmblemColor       String?   // "r,g,b,a"
+  crestBorderId          Int?
+  crestBorderColor       String?   // "r,g,b,a"
+  crestBgColor           String?   // "r,g,b,a"
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 

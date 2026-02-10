@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@/i18n/navigation";
-import { Radio, RefreshCw, Users, Swords, User } from "lucide-react";
+import { Radio } from "lucide-react";
+import { GuildCrest } from "@/components/guild-crest";
 
 interface SeedItem {
   id: string;
@@ -15,6 +16,11 @@ interface SeedItem {
   guildId: string;
   guildRealm: string;
   guildRegion: string;
+  crestEmblemId: number | null;
+  crestEmblemColor: string | null;
+  crestBorderId: number | null;
+  crestBorderColor: string | null;
+  crestBgColor: string | null;
 }
 
 interface FeedItem {
@@ -24,6 +30,11 @@ interface FeedItem {
   guildName?: string;
   guildRealm?: string;
   guildRegion?: string;
+  crestEmblemId?: number | null;
+  crestEmblemColor?: string | null;
+  crestBorderId?: number | null;
+  crestBorderColor?: string | null;
+  crestBgColor?: string | null;
   timestamp: string;
   data?: Record<string, unknown>;
   isLive?: boolean;
@@ -61,21 +72,6 @@ function eventLabel(item: FeedItem): string {
   }
 }
 
-function eventIcon(type: string) {
-  switch (type) {
-    case "discovery:complete":
-    case "discovery":
-      return <Users className="w-3 h-3 text-blue-400" />;
-    case "sync:complete":
-    case "active_sync":
-      return <RefreshCw className="w-3 h-3 text-accent" />;
-    case "member:updated":
-      return <User className="w-3 h-3 text-green-400" />;
-    default:
-      return <Swords className="w-3 h-3 text-[var(--text-secondary)]" />;
-  }
-}
-
 // Convert server-rendered seed data to FeedItem format
 function seedToFeedItems(seeds: SeedItem[]): FeedItem[] {
   return seeds.map((s) => ({
@@ -85,6 +81,11 @@ function seedToFeedItems(seeds: SeedItem[]): FeedItem[] {
     guildName: s.guildName,
     guildRealm: s.guildRealm,
     guildRegion: s.guildRegion,
+    crestEmblemId: s.crestEmblemId,
+    crestEmblemColor: s.crestEmblemColor,
+    crestBorderId: s.crestBorderId,
+    crestBorderColor: s.crestBorderColor,
+    crestBgColor: s.crestBgColor,
     timestamp: s.completedAt || new Date().toISOString(),
     data: { processedItems: s.processedItems, total: s.totalItems, duration: s.duration },
   }));
@@ -176,9 +177,15 @@ export function ActivitySidebar({ seed }: { seed: SeedItem[] }) {
                   item.isLive ? "animate-in fade-in slide-in-from-top-1 duration-300" : ""
                 }`}
               >
-                <div className="w-6 h-6 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 mt-0.5 border border-[var(--border)] group-hover:border-accent/30">
-                  {eventIcon(item.type)}
-                </div>
+                <GuildCrest
+                  emblemId={item.crestEmblemId ?? null}
+                  emblemColor={item.crestEmblemColor ?? null}
+                  borderId={item.crestBorderId ?? null}
+                  borderColor={item.crestBorderColor ?? null}
+                  bgColor={item.crestBgColor ?? null}
+                  size={28}
+                  className="mt-0.5"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-bold truncate group-hover:text-accent transition-colors leading-tight">
                     {item.guildName || "Unknown Guild"}

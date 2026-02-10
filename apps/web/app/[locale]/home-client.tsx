@@ -30,6 +30,11 @@ interface ActivityItem {
   guildId: string;
   guildRealm: string;
   guildRegion: string;
+  crestEmblemId: number | null;
+  crestEmblemColor: string | null;
+  crestBorderId: number | null;
+  crestBorderColor: string | null;
+  crestBgColor: string | null;
 }
 
 interface HomeClientProps {

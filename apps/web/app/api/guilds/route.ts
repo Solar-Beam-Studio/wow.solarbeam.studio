@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate guild exists on Blizzard before creating
-    const exists = await validateGuildExists(name, normalizedRealm, normalizedRegion);
+    const { exists, crest } = await validateGuildExists(name, normalizedRealm, normalizedRegion);
     if (!exists) {
       return NextResponse.json(
         { error: "Guild not found on Blizzard. Check the name, realm, and region." },
@@ -109,6 +109,11 @@ export async function POST(request: NextRequest) {
           name,
           realm: normalizedRealm,
           region: normalizedRegion,
+          crestEmblemId: crest.emblemId,
+          crestEmblemColor: crest.emblemColor,
+          crestBorderId: crest.borderId,
+          crestBorderColor: crest.borderColor,
+          crestBgColor: crest.bgColor,
         },
       });
 

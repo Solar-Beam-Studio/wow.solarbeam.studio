@@ -93,7 +93,13 @@ export default async function HomePage({
         processedItems: true,
         completedAt: true,
         duration: true,
-        guild: { select: { name: true, id: true, realm: true, region: true } },
+        guild: {
+          select: {
+            name: true, id: true, realm: true, region: true,
+            crestEmblemId: true, crestEmblemColor: true,
+            crestBorderId: true, crestBorderColor: true, crestBgColor: true,
+          },
+        },
       },
     }),
     prisma.guildMember.findMany({
@@ -252,6 +258,11 @@ export default async function HomePage({
     guildId: job.guild.id,
     guildRealm: job.guild.realm,
     guildRegion: job.guild.region,
+    crestEmblemId: job.guild.crestEmblemId,
+    crestEmblemColor: job.guild.crestEmblemColor,
+    crestBorderId: job.guild.crestBorderId,
+    crestBorderColor: job.guild.crestBorderColor,
+    crestBgColor: job.guild.crestBgColor,
   }));
 
   return (

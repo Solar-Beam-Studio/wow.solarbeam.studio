@@ -55,8 +55,67 @@ function validateBlizzardUrl(url: string): string {
   return url;
 }
 
+export interface GuildCrest {
+  emblemId: number | null;
+  emblemColor: string | null; // "r,g,b,a"
+  borderId: number | null;
+  borderColor: string | null;
+  bgColor: string | null;
+}
+
 export class ExternalApiService {
   constructor(private tokenService: BlizzardTokenService) {}
+
+  // ============================================================================
+  // GUILD CREST
+  // ============================================================================
+
+  async getGuildCrest(
+    guildName: string,
+    realm: string,
+    region: string
+  ): Promise<GuildCrest> {
+    const empty: GuildCrest = { emblemId: null, emblemColor: null, borderId: null, borderColor: null, bgColor: null };
+
+    try {
+      const r = validateRegion(region);
+      const token = await this.tokenService.getToken();
+      const normalizedGuild = encodeURIComponent(guildName.toLowerCase().replace(/\s+/g, "-"));
+      const normalizedRealm = encodeURIComponent(realm.toLowerCase());
+
+      const url = `https://${r}.api.blizzard.com/data/wow/guild/${normalizedRealm}/${normalizedGuild}?namespace=profile-${r}&locale=en_US`;
+
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) return empty;
+
+      const data = (await response.json()) as {
+        crest?: {
+          emblem?: { id?: number; color?: { rgba?: { r: number; g: number; b: number; a: number } } };
+          border?: { id?: number; color?: { rgba?: { r: number; g: number; b: number; a: number } } };
+          background?: { color?: { rgba?: { r: number; g: number; b: number; a: number } } };
+        };
+      };
+
+      const c = data.crest;
+      if (!c) return empty;
+
+      const rgba = (obj?: { r: number; g: number; b: number; a: number }) =>
+        obj ? `${obj.r},${obj.g},${obj.b},${obj.a}` : null;
+
+      return {
+        emblemId: c.emblem?.id ?? null,
+        emblemColor: rgba(c.emblem?.color?.rgba),
+        borderId: c.border?.id ?? null,
+        borderColor: rgba(c.border?.color?.rgba),
+        bgColor: rgba(c.background?.color?.rgba),
+      };
+    } catch {
+      return empty;
+    }
+  }
 
   // ============================================================================
   // GUILD ROSTER
