@@ -141,6 +141,26 @@
     "pvpRbg": "RBG",
     "pvpBlitz": "Blitz"
   },
+  "faq": {
+    "title": "FAQ",
+    "description": "Questions frequemment posees sur WoW Guilds",
+    "q1": "Qu'est-ce que WoW Guilds ?",
+    "a1": "WoW Guilds est un outil gratuit qui permet de rechercher n'importe quelle guilde World of Warcraft et de voir instantanement le niveau d'objet, le score M+, les cotes PvP, la progression raid et le statut d'activite de chaque membre — le tout dans un seul tableau.",
+    "q2": "D'ou viennent les donnees ?",
+    "a2": "Les rosters de guilde et les cotes PvP proviennent de l'API officielle de Blizzard. Les scores M+ viennent de Raider.IO, qui suit toutes les donjons enregistres. On combine les deux sources pour vous offrir la vue la plus complete.",
+    "q3": "A quelle frequence les donnees sont-elles mises a jour ?",
+    "a3": "Les stats des personnages (iLvl, score M+, cotes PvP) sont actualisees toutes les 30 minutes. Le roster de guilde (nouveaux membres, departs) est mis a jour toutes les 6 heures. Vous pouvez aussi utiliser le bouton actualiser sur la page d'une guilde pour une mise a jour instantanee.",
+    "q4": "Ai-je besoin d'un compte ?",
+    "a4": "Non. Vous pouvez rechercher n'importe quelle guilde et parcourir le roster complet sans creer de compte. Les comptes ne sont necessaires que pour gerer votre propre tableau de bord de guilde.",
+    "q5": "Comment ajouter ma guilde ?",
+    "a5": "Cherchez simplement votre guilde sur la page d'accueil. Si elle n'est pas encore suivie, nous la validerons automatiquement aupres de Blizzard et lancerons la premiere synchronisation. Aucune configuration requise.",
+    "q6": "Que signifie le statut d'activite ?",
+    "a6": "Le statut d'activite est base sur la derniere date de connexion de chaque personnage fournie par Blizzard. Actif signifie connecte dans les 30 derniers jours, inactif entre 30 et 90 jours, et absent au-dela de 90 jours.",
+    "q7": "Est-ce affilie a Blizzard ?",
+    "a7": "Non. WoW Guilds est un projet fan independant. World of Warcraft et Blizzard Entertainment sont des marques deposees de Blizzard Entertainment, Inc. Nous utilisons les API publiques en conformite avec leurs conditions d'utilisation.",
+    "q8": "Est-ce gratuit ?",
+    "a8": "Oui, entierement gratuit. Pas de pubs, pas de paywall, pas de tier premium."
+  },
   "sidebar": {
     "navigation": "Navigation",
     "explore": "Explorer",

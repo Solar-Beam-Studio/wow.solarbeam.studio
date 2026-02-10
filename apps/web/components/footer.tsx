@@ -14,6 +14,12 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-6 text-[11px] text-gray-500">
+          <Link
+            href="/faq"
+            className="hover:text-white transition-colors"
+          >
+            FAQ
+          </Link>
           <a
             href="https://worldofwarcraft.blizzard.com"
             target="_blank"
