@@ -16,6 +16,8 @@ export interface CharacterData {
   rbgShuffleRating: number;
   achievementPoints: number;
   raidProgress: string | null;
+  weeklyKeysCompleted: number;
+  weeklyBestKeyLevel: number;
   lastUpdated: Date;
 }
 
@@ -205,7 +207,7 @@ export class ExternalApiService {
     region: string
   ): Promise<CharacterData> {
     const r = validateRegion(region);
-    const url = `https://raider.io/api/v1/characters/profile?region=${r}&realm=${encodeURIComponent(realm)}&name=${encodeURIComponent(name)}&fields=gear,mythic_plus_scores_by_season:current,raid_progression`;
+    const url = `https://raider.io/api/v1/characters/profile?region=${r}&realm=${encodeURIComponent(realm)}&name=${encodeURIComponent(name)}&fields=gear,mythic_plus_scores_by_season:current,mythic_plus_weekly_highest_level_runs,raid_progression`;
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -218,6 +220,11 @@ export class ExternalApiService {
       mythic_plus_scores_by_season?: Array<{
         scores?: { all?: number };
         season?: string;
+      }>;
+      mythic_plus_weekly_highest_level_runs?: Array<{
+        dungeon: string;
+        mythic_level: number;
+        num_keystone_upgrades: number;
       }>;
       raid_progression?: Record<string, RaidProgressionData>;
     };
@@ -235,6 +242,10 @@ export class ExternalApiService {
       mythicPlusScore = season.scores?.all || 0;
       currentSeason = season.season || null;
     }
+
+    const weeklyRuns = data.mythic_plus_weekly_highest_level_runs || [];
+    const weeklyKeysCompleted = weeklyRuns.length;
+    const weeklyBestKeyLevel = weeklyRuns.reduce((max, run) => Math.max(max, run.mythic_level), 0);
 
     let raidProgress: string | null = null;
     if (data.raid_progression) {
@@ -271,6 +282,8 @@ export class ExternalApiService {
       mythicPlusScore,
       currentSeason,
       raidProgress,
+      weeklyKeysCompleted,
+      weeklyBestKeyLevel,
       ...blizzardExtras,
       lastUpdated: new Date(),
     };
@@ -517,6 +530,8 @@ export class ExternalApiService {
       mythicPlusScore: 0,
       currentSeason: null,
       raidProgress: null,
+      weeklyKeysCompleted: 0,
+      weeklyBestKeyLevel: 0,
       ...blizzardExtras,
       lastUpdated: new Date(),
     };

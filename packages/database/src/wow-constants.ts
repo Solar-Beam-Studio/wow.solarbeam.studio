@@ -75,3 +75,10 @@ export function getAchievementColor(points: number): string {
   if (points >= 10000) return "text-green-400";
   return "text-zinc-400";
 }
+
+export function getVaultColor(runs: number): string {
+  if (runs >= 8) return "text-purple-400";
+  if (runs >= 4) return "text-blue-400";
+  if (runs >= 1) return "text-green-400";
+  return "text-zinc-400";
+}

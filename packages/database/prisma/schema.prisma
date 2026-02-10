@@ -131,6 +131,8 @@ model GuildMember {
   rbgShuffleRating       Int       @default(0)
   achievementPoints      Int       @default(0)
   raidProgress           String?
+  weeklyKeysCompleted    Int       @default(0)
+  weeklyBestKeyLevel     Int       @default(0)
   lastLoginTimestamp     BigInt?
   activityStatus         String    @default("inactive")
   lastActivityCheck      DateTime  @default(now())

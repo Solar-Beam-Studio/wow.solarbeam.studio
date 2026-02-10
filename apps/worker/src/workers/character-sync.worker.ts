@@ -77,6 +77,8 @@ export function createCharacterSyncWorker(
               rbgShuffleRating: data.rbgShuffleRating,
               achievementPoints: data.achievementPoints,
               raidProgress: data.raidProgress,
+              weeklyKeysCompleted: data.weeklyKeysCompleted,
+              weeklyBestKeyLevel: data.weeklyBestKeyLevel,
               lastHourlyCheck: new Date(),
               lastUpdated: new Date(),
             },

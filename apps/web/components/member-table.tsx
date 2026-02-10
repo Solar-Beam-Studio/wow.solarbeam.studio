@@ -9,6 +9,7 @@ import {
   getItemLevelColor,
   getMythicPlusColor,
   getAchievementColor,
+  getVaultColor,
 } from "@wow/database/constants";
 import type { GuildMember } from "@/hooks/use-members";
 import { DataTable, type Column } from "@/components/data-table";
@@ -134,6 +135,20 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
           {m.mythicPlusScore ? Math.round(m.mythicPlusScore) : "-"}
         </span>
       ),
+    },
+    {
+      key: "weeklyKeysCompleted",
+      label: t("vault"),
+      align: "right",
+      sortValue: (m) => m.weeklyKeysCompleted ?? 0,
+      render: (m) => {
+        const runs = m.weeklyKeysCompleted ?? 0;
+        return (
+          <span className={`text-[0.8125rem] font-mono font-medium tabular-nums ${getVaultColor(runs)}`}>
+            {runs > 0 ? `${runs}/8` : "-"}
+          </span>
+        );
+      },
     },
     {
       key: "raidProgress",

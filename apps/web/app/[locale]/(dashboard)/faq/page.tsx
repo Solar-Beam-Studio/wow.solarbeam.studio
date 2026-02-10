@@ -9,13 +9,18 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "faq" });
+  const mt = await getTranslations({ locale, namespace: "meta" });
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title: mt("faqTitle"),
+    description: mt("faqDescription"),
     alternates: {
+      canonical: "/faq",
       languages: { en: "/faq", fr: "/fr/faq" },
+    },
+    openGraph: {
+      title: mt("faqTitle"),
+      description: mt("faqDescription"),
     },
   };
 }
@@ -31,27 +36,30 @@ export default async function FaqPage({ params }: Props) {
     answer: t(`a${n}`),
   }));
 
-  // JSON-LD FAQPage structured data for Google rich results
-  // Safe: content comes from our own translation files, not user input
-  const jsonLd = {
+  // Safe: all content comes from our own translation files, not user input
+  const faqJsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: items.map((item) => ({
       "@type": "Question",
       name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
     })),
-  };
+  });
+
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://wowguilds.com" },
+      { "@type": "ListItem", position: 2, name: "FAQ", item: "https://wowguilds.com/faq" },
+    ],
+  });
 
   return (
     <div className="w-full max-w-3xl mx-auto px-8 py-10 md:py-16">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
       <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-2">
         {t("title")}

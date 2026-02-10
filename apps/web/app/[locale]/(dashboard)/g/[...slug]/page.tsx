@@ -106,13 +106,43 @@ async function resolveGuild(slug: string[]) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const t = await getTranslations({ locale, namespace: "guildDetail" });
+  const mt = await getTranslations({ locale, namespace: "meta" });
 
   if (slug.length === 3) {
     const [region, realm, nameSlug] = slug;
     const guildName = decodeURIComponent(nameSlug).replace(/-/g, " ");
+    const regionUpper = region.toUpperCase();
+
+    const memberCount = await prisma.guildMember.count({
+      where: {
+        guild: {
+          region,
+          realm,
+          name: { equals: guildName, mode: "insensitive" },
+        },
+      },
+    });
+
+    const title = mt("guildTitle", { guild: guildName, realm, region: regionUpper });
+    const description = mt("guildDescription", {
+      guild: guildName,
+      realm,
+      region: regionUpper,
+      memberCount: memberCount || "all",
+    });
+    const canonicalPath = `/g/${region}/${realm}/${nameSlug}`;
+
     return {
-      title: `${guildName} — ${realm} (${region.toUpperCase()})`,
-      description: `View ${guildName}'s roster on ${realm}-${region.toUpperCase()}`,
+      title,
+      description,
+      alternates: {
+        canonical: canonicalPath,
+        languages: {
+          en: canonicalPath,
+          fr: `/fr${canonicalPath}`,
+        },
+      },
+      openGraph: { title, description },
     };
   }
 
@@ -123,10 +153,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       select: { name: true, realm: true, region: true },
     });
     if (guild) {
-      return {
-        title: `${guild.name} — ${guild.realm} (${guild.region.toUpperCase()})`,
-        description: `View ${guild.name}'s roster on ${guild.realm}-${guild.region.toUpperCase()}`,
-      };
+      const title = mt("guildTitle", {
+        guild: guild.name,
+        realm: guild.realm,
+        region: guild.region.toUpperCase(),
+      });
+      return { title };
     }
   }
 
@@ -156,7 +188,18 @@ export default async function PublicGuildPage({ params }: Props) {
     lastUpdated: m.lastUpdated.toISOString(),
   }));
 
+  // JSON-LD structured data — safe: guild name comes from Blizzard API, not raw user input
+  const guildJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: guild.name,
+    url: `https://wowguilds.com/g/${guild.region}/${guild.realm}/${guildSlug(guild.name)}`,
+    description: `${guild.name} — ${guild.realm} (${guild.region.toUpperCase()}) World of Warcraft guild with ${serialized.length} members`,
+  });
+
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: guildJsonLd }} />
     <div className="w-full px-8 md:px-16 py-10 md:py-12">
       <div className="mb-10 flex items-center gap-5">
         <GuildCrest
@@ -202,5 +245,6 @@ export default async function PublicGuildPage({ params }: Props) {
 
       <PublicGuildClient members={serialized} region={guild.region} />
     </div>
+    </>
   );
 }

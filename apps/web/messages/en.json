@@ -1,7 +1,14 @@
 {
   "meta": {
     "title": "WoW Guilds — Guild Roster Inspector",
-    "description": "Look up any WoW guild. See every member's gear, M+ score, PvP rating, raid progress, and activity — in one table."
+    "description": "Look up any WoW guild. See every member's gear, M+ score, PvP rating, raid progress, and activity — in one table.",
+    "homeTitle": "WoW Guild Search — Look Up Any Guild Roster, M+ Scores & PvP Ratings",
+    "homeDescription": "Search any World of Warcraft guild and instantly view the full roster with item levels, Mythic+ scores, PvP ratings, raid progress, and activity status for every member.",
+    "guildTitle": "{guild} on {realm}-{region} — Roster, iLvl, M+ & PvP | WoW Guilds",
+    "guildDescription": "View {guild}'s full roster on {realm}-{region}. See item levels, Mythic+ scores, PvP ratings, raid progress and activity status for all {memberCount} members.",
+    "faqTitle": "FAQ — WoW Guild Search & Roster Tool | WoW Guilds",
+    "faqDescription": "Answers to common questions about WoW Guilds — the free guild search and roster lookup tool for World of Warcraft.",
+    "keywords": "wow guild search, wow guild lookup, wow guild roster, wow guild members, mythic plus scores, pvp ratings, wow armory, world of warcraft guild, guild roster viewer, wow guild tracker"
   },
   "common": {
     "justNow": "just now",
@@ -142,6 +149,7 @@
     "status": "Status",
     "itemLevel": "iLvl",
     "mythicPlus": "M+",
+    "vault": "Vault",
     "raids": "Raids",
     "achievements": "Achiev",
     "pvp2v2": "2v2",

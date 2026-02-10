@@ -1,8 +1,31 @@
 import { prisma } from "@wow/database";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeClient } from "./home-client";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "meta" });
+
+  return {
+    title: t("homeTitle"),
+    description: t("homeDescription"),
+    alternates: {
+      canonical: "/",
+      languages: { en: "/", fr: "/fr" },
+    },
+    openGraph: {
+      title: t("homeTitle"),
+      description: t("homeDescription"),
+    },
+  };
+}
 
 export default async function HomePage({
   params,
@@ -111,13 +134,49 @@ export default async function HomePage({
     crestBgColor: g.crestBgColor,
   }));
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "WoW Guilds",
+    url: "https://wowguilds.com",
+    description: "Search any World of Warcraft guild and view the full roster with item levels, M+ scores, PvP ratings, and raid progress.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://wowguilds.com/g/{region}/{realm}/{guild_name}",
+      },
+      "query-input": "required name=guild_name",
+    },
+  };
+
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "WoW Guilds",
+    url: "https://wowguilds.com",
+    logo: "https://wowguilds.com/logomark.svg",
+  };
+
   return (
-    <HomeClient
-      guilds={guilds}
-      totalMembers={totalMembers}
-      activeMembers={activeMembers}
-      recentActivity={recentActivity}
-      recentGuilds={recentGuildsData}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        // Safe: content is hardcoded, not user input
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        // Safe: content is hardcoded, not user input
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
+      <HomeClient
+        guilds={guilds}
+        totalMembers={totalMembers}
+        activeMembers={activeMembers}
+        recentActivity={recentActivity}
+        recentGuilds={recentGuildsData}
+      />
+    </>
   );
 }

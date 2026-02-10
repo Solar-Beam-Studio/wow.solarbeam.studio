@@ -16,6 +16,8 @@ export interface GuildMember {
   rbgShuffleRating: number;
   achievementPoints: number;
   raidProgress: string | null;
+  weeklyKeysCompleted: number;
+  weeklyBestKeyLevel: number;
   lastLoginTimestamp: number | null;
   activityStatus: string;
   lastUpdated: string;

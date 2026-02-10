@@ -1,7 +1,14 @@
 {
   "meta": {
     "title": "WoW Guilds — Inspecteur de Roster",
-    "description": "Cherchez n'importe quelle guilde WoW. Voir l'stuff, le score M+, les cotes PvP, la progression raid et l'activite de chaque membre — en un tableau."
+    "description": "Cherchez n'importe quelle guilde WoW. Voir l'stuff, le score M+, les cotes PvP, la progression raid et l'activite de chaque membre — en un tableau.",
+    "homeTitle": "Recherche de Guilde WoW — Roster, Scores M+ et Cotes PvP",
+    "homeDescription": "Recherchez n'importe quelle guilde World of Warcraft et consultez instantanement le roster complet avec niveaux d'objet, scores M+, cotes PvP, progression raid et statut d'activite de chaque membre.",
+    "guildTitle": "{guild} sur {realm}-{region} — Roster, iLvl, M+ & PvP | WoW Guilds",
+    "guildDescription": "Consultez le roster complet de {guild} sur {realm}-{region}. Niveaux d'objet, scores M+, cotes PvP, progression raid et statut d'activite pour les {memberCount} membres.",
+    "faqTitle": "FAQ — Recherche de Guilde WoW & Outil de Roster | WoW Guilds",
+    "faqDescription": "Reponses aux questions frequentes sur WoW Guilds — l'outil gratuit de recherche de guilde et de consultation de roster pour World of Warcraft.",
+    "keywords": "recherche guilde wow, lookup guilde wow, roster guilde wow, membres guilde wow, scores mythique plus, cotes pvp, armurerie wow, guilde world of warcraft"
   },
   "common": {
     "justNow": "a l'instant",
@@ -142,6 +149,7 @@
     "status": "Statut",
     "itemLevel": "iLvl",
     "mythicPlus": "M+",
+    "vault": "Coffre",
     "raids": "Raids",
     "achievements": "Hauts faits",
     "pvp2v2": "2v2",

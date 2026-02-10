@@ -25,8 +25,21 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "meta" });
 
   return {
+    metadataBase: new URL("https://wowguilds.com"),
     title: t("title"),
     description: t("description"),
+    keywords: t("keywords"),
+    robots: { index: true, follow: true },
+    icons: { icon: "/icon.svg" },
+    openGraph: {
+      type: "website",
+      siteName: "WoW Guilds",
+      locale,
+      images: [{ url: "/hero.webp", width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
     alternates: {
       languages: {
         en: "/",
@@ -55,7 +68,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="dark">
-      <head />
+      <head>
+        <script
+          defer
+          src="https://api.pirsch.io/pa.js"
+          id="pianjs"
+          data-code={process.env.NEXT_PUBLIC_PIRSCH_CODE}
+        />
+      </head>
       <body className={`${inter.className} ${rajdhani.variable} ${jetbrainsMono.variable} min-h-screen bg-[#0b0b0d] text-white antialiased`}>
         {/* Background image — visible at top, fades to solid at bottom */}
         <div className="fixed inset-0 z-0 pointer-events-none">
