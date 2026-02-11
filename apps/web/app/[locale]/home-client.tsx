@@ -8,7 +8,7 @@ import { AppLogo } from "@/components/app-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { GuildCrest } from "@/components/guild-crest";
 import { Footer } from "@/components/footer";
-import { Eye, Activity, Users, Clock, History } from "lucide-react";
+import { Eye, Activity, Users, History } from "lucide-react";
 import { guildPath } from "@/lib/guild-url";
 
 interface ActivityItem {
@@ -29,20 +29,6 @@ interface ActivityItem {
   crestBgColor: string | null;
 }
 
-interface RecentGuild {
-  id: string;
-  name: string;
-  realm: string;
-  region: string;
-  memberCount: number;
-  updatedAt: string;
-  crestEmblemId: number | null;
-  crestEmblemColor: string | null;
-  crestBorderId: number | null;
-  crestBorderColor: string | null;
-  crestBgColor: string | null;
-}
-
 interface RecentSearch {
   id: string;
   name: string;
@@ -55,10 +41,9 @@ interface HomeClientProps {
   totalMembers: number;
   activeMembers: number;
   recentActivity: ActivityItem[];
-  recentGuilds: RecentGuild[];
 }
 
-export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity, recentGuilds }: HomeClientProps) {
+export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity }: HomeClientProps) {
   const t = useTranslations("home");
   const tc = useTranslations("common");
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
@@ -69,17 +54,6 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
       if (saved) setRecentSearches(JSON.parse(saved).slice(0, 5));
     } catch {}
   }, []);
-
-  function timeAgo(dateStr: string): string {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const secs = Math.floor(diff / 1000);
-    if (secs < 60) return tc("justNow");
-    const mins = Math.floor(secs / 60);
-    if (mins < 60) return tc("minsAgo", { n: mins });
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return tc("hoursAgo", { n: hours });
-    return tc("daysAgo", { n: Math.floor(hours / 24) });
-  }
 
   function eventLabel(type: string, total: number, processed: number): string {
     switch (type) {
@@ -175,7 +149,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
         )}
       </section>
 
-      {/* Recently searched + Recently updated */}
+      {/* Recently searched */}
       <section className="max-w-3xl mx-auto px-4 pb-20 space-y-10">
         {/* Recently Searched (from localStorage) */}
         {recentSearches.length > 0 && (
@@ -205,46 +179,9 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
           </div>
         )}
 
-        {/* Recently Updated (from server) */}
-        {recentGuilds.length > 0 && (
-          <div className="animate-fade-up delay-7">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-3.5 h-3.5 text-gray-600" />
-              <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
-                {t("recentlyUpdated")}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {recentGuilds.map((g) => (
-                <Link
-                  key={g.id}
-                  href={guildPath(g)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all group"
-                >
-                  <GuildCrest
-                    emblemId={g.crestEmblemId}
-                    emblemColor={g.crestEmblemColor}
-                    borderId={g.crestBorderId}
-                    borderColor={g.crestBorderColor}
-                    bgColor={g.crestBgColor}
-                    size={32}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-bold group-hover:text-violet-400 transition-colors truncate">
-                      {g.name}
-                    </div>
-                    <div className="text-[10px] text-gray-600">
-                      {g.realm}-{g.region.toUpperCase()} · {g.memberCount} {t("members")} · {timeAgo(g.updatedAt)}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </section>
 
-      <div className="animate-fade-in delay-8">
+      <div className="animate-fade-in delay-7">
         <Footer />
       </div>
     </div>

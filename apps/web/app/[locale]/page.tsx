@@ -35,7 +35,7 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [guilds, totalMembers, activeMembers, recentSyncJobs, recentGuilds] =
+  const [guilds, totalMembers, activeMembers, recentSyncJobs] =
     await Promise.all([
       prisma.guild.findMany({
         orderBy: { updatedAt: "desc" },
@@ -75,23 +75,6 @@ export default async function HomePage({
           },
         },
       }),
-      prisma.guild.findMany({
-        orderBy: { updatedAt: "desc" },
-        take: 8,
-        select: {
-          id: true,
-          name: true,
-          realm: true,
-          region: true,
-          memberCount: true,
-          updatedAt: true,
-          crestEmblemId: true,
-          crestEmblemColor: true,
-          crestBorderId: true,
-          crestBorderColor: true,
-          crestBgColor: true,
-        },
-      }),
     ]);
 
   // Deduplicate: keep only the latest sync job per guild
@@ -118,20 +101,6 @@ export default async function HomePage({
     crestBorderId: job.guild.crestBorderId,
     crestBorderColor: job.guild.crestBorderColor,
     crestBgColor: job.guild.crestBgColor,
-  }));
-
-  const recentGuildsData = recentGuilds.map((g) => ({
-    id: g.id,
-    name: g.name,
-    realm: g.realm,
-    region: g.region,
-    memberCount: g.memberCount,
-    updatedAt: g.updatedAt.toISOString(),
-    crestEmblemId: g.crestEmblemId,
-    crestEmblemColor: g.crestEmblemColor,
-    crestBorderId: g.crestBorderId,
-    crestBorderColor: g.crestBorderColor,
-    crestBgColor: g.crestBgColor,
   }));
 
   const websiteJsonLd = {
@@ -175,7 +144,6 @@ export default async function HomePage({
         totalMembers={totalMembers}
         activeMembers={activeMembers}
         recentActivity={recentActivity}
-        recentGuilds={recentGuildsData}
       />
     </>
   );
