@@ -38,7 +38,6 @@
     "addYourGuild": "Ajouter votre Guilde",
     "noGuildsMatch": "Aucune guilde ne correspond a votre recherche.",
     "noGuildsYet": "Cherchez une guilde ci-dessus pour commencer.",
-    "members": "membres",
     "topRanks": "Meilleurs Classements",
     "guildNamePlaceholder": "Nom de la Guilde",
     "realmPlaceholder": "Royaume",
@@ -49,7 +48,6 @@
     "valueProp2": "Detection d'activite",
     "valueProp3": "Aucun compte requis",
     "recentlySearched": "Recherches recentes",
-    "recentlyUpdated": "Mises a jour recentes",
     "selectRegion": "Region",
     "chars": "persos"
   },

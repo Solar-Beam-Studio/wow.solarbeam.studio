@@ -38,7 +38,6 @@
     "addYourGuild": "Add Your Guild",
     "noGuildsMatch": "No guilds match your search.",
     "noGuildsYet": "Search for a guild above to get started.",
-    "members": "members",
     "topRanks": "Top Ranks",
     "guildNamePlaceholder": "Guild Name",
     "realmPlaceholder": "Realm",
@@ -49,7 +48,6 @@
     "valueProp2": "Activity detection",
     "valueProp3": "No account needed",
     "recentlySearched": "Recently Searched",
-    "recentlyUpdated": "Recently Updated",
     "selectRegion": "Select Region",
     "chars": "chars"
   },
