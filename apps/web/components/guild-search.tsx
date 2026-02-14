@@ -78,6 +78,8 @@ export function GuildSearch() {
   const [suggestions, setSuggestions] = useState<GuildSuggestion[]>([]);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const suggestionsDropdownRef = useRef<HTMLDivElement>(null);
+  const [suggestionsMenuPos, setSuggestionsMenuPos] = useState({ top: 0, left: 0, width: 0 });
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Load recent searches
@@ -141,6 +143,31 @@ export function GuildSearch() {
     };
   }, [realmOpen, updateRealmMenuPos]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const updateSuggestionsMenuPos = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setSuggestionsMenuPos({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (suggestionsOpen) {
+      updateSuggestionsMenuPos();
+      window.addEventListener("scroll", updateSuggestionsMenuPos, true);
+      window.addEventListener("resize", updateSuggestionsMenuPos);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateSuggestionsMenuPos, true);
+      window.removeEventListener("resize", updateSuggestionsMenuPos);
+    };
+  }, [suggestionsOpen, updateSuggestionsMenuPos]);
+
   // Fetch realms when region changes
   useEffect(() => {
     fetch(`/api/realms?region=${region}`)
@@ -198,7 +225,10 @@ export function GuildSearch() {
       ) {
         setRealmOpen(false);
       }
-      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+      if (
+        suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
+        (!suggestionsDropdownRef.current || !suggestionsDropdownRef.current.contains(e.target as Node))
+      ) {
         setSuggestionsOpen(false);
       }
       if (regionBtnRef.current && !regionBtnRef.current.contains(e.target as Node)) {
@@ -256,7 +286,7 @@ export function GuildSearch() {
   }
 
   return (
-    <div className="mt-12 w-full max-w-3xl relative">
+    <div ref={containerRef} className="mt-12 w-full max-w-3xl relative">
       <form
         onSubmit={handleSubmit}
         className={`relative glass p-3 rounded-2xl md:rounded-[2.5rem] transition-all duration-300 ease-out ${
@@ -419,9 +449,13 @@ export function GuildSearch() {
         </div>
       </form>
 
-      {/* Suggestions dropdown — full width of search bar */}
-      {(suggestionsOpen && (suggestions.length > 0 || (recentSearches.length > 0 && !guildName))) && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-[#0b0b0d] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden transition-all duration-200 ease-out">
+      {/* Suggestions dropdown — rendered via portal to avoid stacking context issues */}
+      {mounted && suggestionsOpen && (suggestions.length > 0 || (recentSearches.length > 0 && !guildName)) && createPortal(
+        <div
+          ref={suggestionsDropdownRef}
+          className="fixed z-[9999] bg-[#0b0b0d] border border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-all duration-200 ease-out"
+          style={{ top: suggestionsMenuPos.top, left: suggestionsMenuPos.left, width: suggestionsMenuPos.width }}
+        >
           {!guildName && (
             <div className="p-2 border-b border-white/5 bg-white/[0.02]">
               <p className="px-3 py-1 text-[11px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
@@ -491,7 +525,8 @@ export function GuildSearch() {
               </button>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {error && (
