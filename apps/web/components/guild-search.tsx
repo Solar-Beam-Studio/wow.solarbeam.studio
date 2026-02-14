@@ -69,6 +69,9 @@ export function GuildSearch() {
   const [realmOpen, setRealmOpen] = useState(false);
   const [realmFiltered, setRealmFiltered] = useState<Realm[]>([]);
   const realmRef = useRef<HTMLDivElement>(null);
+  const realmInputRef = useRef<HTMLInputElement>(null);
+  const realmDropdownRef = useRef<HTMLDivElement>(null);
+  const [realmMenuPos, setRealmMenuPos] = useState({ top: 0, left: 0, width: 256 });
   const guildInputRef = useRef<HTMLInputElement>(null);
 
   // Guild suggestions
@@ -114,6 +117,29 @@ export function GuildSearch() {
     };
   }, [regionOpen]);
 
+
+  const updateRealmMenuPos = useCallback(() => {
+    if (realmInputRef.current) {
+      const rect = realmInputRef.current.getBoundingClientRect();
+      setRealmMenuPos({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+        width: Math.max(256, rect.width),
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (realmOpen) {
+      updateRealmMenuPos();
+      window.addEventListener("scroll", updateRealmMenuPos, true);
+      window.addEventListener("resize", updateRealmMenuPos);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateRealmMenuPos, true);
+      window.removeEventListener("resize", updateRealmMenuPos);
+    };
+  }, [realmOpen, updateRealmMenuPos]);
 
   // Fetch realms when region changes
   useEffect(() => {
@@ -166,7 +192,10 @@ export function GuildSearch() {
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (realmRef.current && !realmRef.current.contains(e.target as Node)) {
+      if (
+        realmRef.current && !realmRef.current.contains(e.target as Node) &&
+        realmDropdownRef.current && !realmDropdownRef.current.contains(e.target as Node)
+      ) {
         setRealmOpen(false);
       }
       if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
@@ -269,6 +298,7 @@ export function GuildSearch() {
             <div ref={realmRef} className="flex-1 relative min-w-0 px-4 md:px-6">
               <div className="flex items-center">
                 <input
+                  ref={realmInputRef}
                   type="text"
                   value={realm}
                   onChange={(e) => {
@@ -278,6 +308,7 @@ export function GuildSearch() {
                   onFocus={() => {
                     setRealmOpen(true);
                     setIsFocused(true);
+                    updateRealmMenuPos();
                   }}
                   onBlur={() => setIsFocused(false)}
                   placeholder={t("realmPlaceholder")}
@@ -285,8 +316,12 @@ export function GuildSearch() {
                   required
                 />
               </div>
-              {realmOpen && realmFiltered.length > 0 && (
-                <div className="absolute left-0 top-[calc(100%+16px)] w-64 bg-[#0b0b0d] border border-white/10 rounded-3xl shadow-2xl z-[60] overflow-hidden p-2 transition-all duration-200 ease-out">
+              {mounted && realmOpen && realmFiltered.length > 0 && createPortal(
+                <div
+                  ref={realmDropdownRef}
+                  className="fixed z-[9999] bg-[#0b0b0d] border border-white/10 rounded-3xl shadow-2xl overflow-hidden p-2 transition-all duration-200 ease-out"
+                  style={{ top: realmMenuPos.top, left: realmMenuPos.left, width: realmMenuPos.width }}
+                >
                   <div className="max-h-64 overflow-y-auto space-y-1">
                     {realmFiltered.map((r) => (
                       <button
@@ -306,7 +341,8 @@ export function GuildSearch() {
                       </button>
                     ))}
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
 
