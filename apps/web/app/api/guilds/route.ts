@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, Prisma } from "@wow/database";
+import { prisma, Prisma, sendAlert } from "@wow/database";
 import {
   enqueueImmediateDiscovery,
   registerGuildSchedules,
@@ -105,6 +105,15 @@ export async function POST(request: NextRequest) {
 
       // Trigger immediate discovery
       await enqueueImmediateDiscovery(guild.id);
+
+      // Alert on new guild added
+      sendAlert({
+        title: "New Guild Added",
+        message: `${guildName} — ${normalizedRealm} (${normalizedRegion.toUpperCase()})`,
+        level: "info",
+        source: "POST /api/guilds",
+        emoji: "🛡️",
+      }).catch(() => {});
 
       return NextResponse.json(guild, { status: 201 });
     } catch (error) {
