@@ -38,7 +38,7 @@ async function main() {
   const queues = createQueues(connection);
 
   const workers = [
-    createGuildDiscoveryWorker(connection, externalApi, eventPublisher),
+    createGuildDiscoveryWorker(connection, externalApi, eventPublisher, indexNow),
     createCharacterSyncWorker(connection, externalApi, eventPublisher),
     createActivityCheckWorker(connection, externalApi, eventPublisher),
     createSyncSchedulerWorker(connection, eventPublisher),

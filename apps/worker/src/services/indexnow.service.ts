@@ -37,4 +37,11 @@ export class IndexNowService {
       `${prefix}/guides`, // re-index the listing too
     ]);
   }
+
+  async submitGuild(guildPath: string): Promise<void> {
+    await this.submitUrls([
+      guildPath,
+      `/fr${guildPath}`,
+    ]);
+  }
 }

@@ -4,6 +4,7 @@ import { prisma, sendAlert, type Prisma } from "@wow/database";
 import { QUEUE_NAMES } from "../queues";
 import type { ExternalApiService } from "../services/external-api.service";
 import type { EventPublisher } from "../services/event-publisher.service";
+import type { IndexNowService } from "../services/indexnow.service";
 
 interface DiscoveryJobData {
   guildId: string;
@@ -12,7 +13,8 @@ interface DiscoveryJobData {
 export function createGuildDiscoveryWorker(
   connection: ConnectionOptions,
   externalApi: ExternalApiService,
-  eventPublisher: EventPublisher
+  eventPublisher: EventPublisher,
+  indexNow?: IndexNowService
 ) {
   const syncSchedulerQueue = new Queue(QUEUE_NAMES.SYNC_SCHEDULER, { connection });
 
@@ -265,6 +267,12 @@ export function createGuildDiscoveryWorker(
           updateErrors,
           duration
         );
+
+        // Ping search engines for newly discovered guilds
+        if (existingByName.size === 0 && indexNow) {
+          const slug = guild.name.toLowerCase().replace(/\s+/g, "-");
+          indexNow.submitGuild(`/g/${guild.region}/${guild.realm}/${slug}`).catch(() => {});
+        }
 
         // Trigger immediate character sync so stats populate fast
         await syncSchedulerQueue.add(
