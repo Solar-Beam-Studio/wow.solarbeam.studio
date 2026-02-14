@@ -256,7 +256,7 @@
     "ilvlDistribution": "Item Level Distribution",
     "mplusDistribution": "M+ Score Distribution",
     "raidProgress": "Raid Progress",
-    "none": "None"
+    "basedOn": "{count} of {total} members"
   },
   "sidebar": {
     "navigation": "Navigation",
