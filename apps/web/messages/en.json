@@ -193,6 +193,25 @@
     "q8": "Is it free?",
     "a8": "Yes, completely free. No ads, no paywalls, no premium tiers."
   },
+  "stats": {
+    "title": "Live Stats",
+    "metaTitle": "WoW Class Rankings & Stats — Live M+ Tier List, PvP Ratings | WoW Guilds",
+    "metaDescription": "Live World of Warcraft class rankings based on real player data. See M+ score tier lists, PvP ratings, item levels, and more from thousands of tracked characters.",
+    "description": "Live rankings from {members} characters across {guilds} guilds",
+    "guildsTracked": "Guilds Tracked",
+    "totalCharacters": "Total Characters",
+    "activeCharacters": "Active (30d)",
+    "avgItemLevel": "Avg Item Level",
+    "classMplusRankings": "Class M+ Rankings (Avg Score)",
+    "topMplus": "Top Mythic+ Players",
+    "topSoloShuffle": "Top Solo Shuffle Players",
+    "character": "Character",
+    "guild": "Guild",
+    "class": "Class",
+    "rating": "Rating",
+    "players": "players",
+    "dataNote": "Data updates every 30 minutes from Blizzard API and Raider.IO. Rankings are based on tracked guilds only."
+  },
   "guides": {
     "title": "Guides",
     "description": "Data-backed World of Warcraft guides and analysis",

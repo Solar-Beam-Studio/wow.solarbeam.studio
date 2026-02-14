@@ -6,6 +6,7 @@ import { EventPublisher } from "./services/event-publisher.service";
 import { OpenRouterService } from "./services/openrouter.service";
 import { PirschService } from "./services/pirsch.service";
 import { DataAggregationService } from "./services/data-aggregation.service";
+import { IndexNowService } from "./services/indexnow.service";
 import { createGuildDiscoveryWorker } from "./workers/guild-discovery.worker";
 import { createCharacterSyncWorker } from "./workers/character-sync.worker";
 import { createActivityCheckWorker } from "./workers/activity-check.worker";
@@ -29,6 +30,7 @@ async function main() {
   const openRouter = new OpenRouterService(redis);
   const pirschService = new PirschService(redis);
   const dataAgg = new DataAggregationService();
+  const indexNow = new IndexNowService();
 
   const queues = createQueues(connection);
 
@@ -39,7 +41,7 @@ async function main() {
     createSyncSchedulerWorker(connection, eventPublisher),
     createGrowthStrategyWorker(connection, openRouter, pirschService, dataAgg),
     createGrowthGenerateWorker(connection, openRouter, dataAgg),
-    createGrowthReviewWorker(connection, openRouter),
+    createGrowthReviewWorker(connection, openRouter, indexNow),
   ];
 
   console.log(`[Worker] ${workers.length} workers started`);

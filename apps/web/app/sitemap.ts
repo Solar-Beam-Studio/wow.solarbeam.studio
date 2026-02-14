@@ -18,6 +18,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: { en: BASE_URL, fr: `${BASE_URL}/fr` } },
     },
     {
+      url: `${BASE_URL}/stats`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+      alternates: { languages: { en: `${BASE_URL}/stats`, fr: `${BASE_URL}/fr/stats` } },
+    },
+    {
       url: `${BASE_URL}/faq`,
       lastModified: now,
       changeFrequency: "weekly",

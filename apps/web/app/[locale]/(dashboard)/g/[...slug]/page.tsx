@@ -189,13 +189,31 @@ export default async function PublicGuildPage({ params }: Props) {
   }));
 
   // JSON-LD structured data — safe: guild name comes from Blizzard API, not raw user input
-  const guildJsonLd = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: guild.name,
-    url: `https://wowguilds.com/g/${guild.region}/${guild.realm}/${guildSlug(guild.name)}`,
-    description: `${guild.name} — ${guild.realm} (${guild.region.toUpperCase()}) World of Warcraft guild with ${serialized.length} members`,
-  });
+  const guildUrl = `https://wowguilds.com/g/${guild.region}/${guild.realm}/${guildSlug(guild.name)}`;
+  const guildJsonLd = JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsTeam",
+      name: guild.name,
+      url: guildUrl,
+      sport: "World of Warcraft",
+      description: `${guild.name} — ${guild.realm} (${guild.region.toUpperCase()}) World of Warcraft guild with ${serialized.length} members`,
+      memberOf: {
+        "@type": "SportsOrganization",
+        name: "World of Warcraft",
+      },
+      numberOfEmployees: serialized.length,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://wowguilds.com" },
+        { "@type": "ListItem", position: 2, name: `${guild.realm} (${guild.region.toUpperCase()})`, item: guildUrl },
+        { "@type": "ListItem", position: 3, name: guild.name, item: guildUrl },
+      ],
+    },
+  ]);
 
   return (
     <>

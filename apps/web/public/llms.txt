@@ -1,0 +1,35 @@
+# WoW Guilds — wowguilds.com
+
+> Free World of Warcraft guild lookup and roster tracking tool.
+
+## What This Site Does
+WoW Guilds lets anyone search any World of Warcraft guild and instantly see the full roster with item levels, Mythic+ scores, PvP ratings, raid progress, and activity status for every member. Data is synced automatically from the Blizzard API and Raider.IO.
+
+## Key Features
+- **Guild Roster Lookup**: Search any guild by name, realm, and region. View all members in a sortable table.
+- **Live Data Sync**: Character stats refresh every 30 minutes. Guild rosters update every 6 hours.
+- **Mythic+ Rankings**: See M+ scores for every guild member, sortable and filterable.
+- **PvP Ratings**: 2v2, 3v3, Solo Shuffle, RBG, and Blitz ratings for all members.
+- **Raid Progress**: Current raid tier progress per character.
+- **Activity Detection**: See which members are active (logged in within 30 days) vs inactive.
+- **Hall of Fame**: Per-guild leaderboards for top performers in PvE and PvP.
+- **Guides**: Data-backed WoW guides and analysis using real player statistics.
+
+## How to Use
+- Search: Visit wowguilds.com and search for any guild name
+- Direct URL: wowguilds.com/g/{region}/{realm}/{guild-name} (e.g., /g/eu/archimonde/pool-party)
+- Guides: wowguilds.com/guides
+
+## Data Sources
+- Guild rosters and PvP ratings: Official Blizzard API
+- Mythic+ scores: Raider.IO
+- All data is public and pulled from official APIs
+
+## Supported Regions
+US, EU, KR, TW, CN
+
+## Languages
+English (default), French (/fr/)
+
+## Contact
+Website: https://wowguilds.com

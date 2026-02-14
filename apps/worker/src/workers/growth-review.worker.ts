@@ -3,6 +3,7 @@ import type { ConnectionOptions } from "bullmq";
 import { prisma, Prisma, sendAlert } from "@wow/database";
 import { QUEUE_NAMES } from "../queues";
 import type { OpenRouterService } from "../services/openrouter.service";
+import type { IndexNowService } from "../services/indexnow.service";
 
 interface ReviewJobData {
   guideId: string;
@@ -18,7 +19,8 @@ interface ReviewResult {
 
 export function createGrowthReviewWorker(
   connection: ConnectionOptions,
-  openRouter: OpenRouterService
+  openRouter: OpenRouterService,
+  indexNow: IndexNowService
 ) {
   const generateQueue = new Queue(QUEUE_NAMES.GROWTH_GENERATE, {
     connection,
@@ -98,6 +100,9 @@ ${guide.content}`,
               publishedAt: new Date(),
             },
           });
+          // Ping search engines
+          indexNow.submitGuide(guide.slug, guide.locale).catch(() => {});
+
           console.log(
             `[Growth/Review] Published "${guide.title}" (score: ${score})`
           );

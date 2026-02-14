@@ -193,6 +193,25 @@
     "q8": "Est-ce gratuit ?",
     "a8": "Oui, entierement gratuit. Pas de pubs, pas de paywall, pas de tier premium."
   },
+  "stats": {
+    "title": "Stats en Direct",
+    "metaTitle": "Classement des Classes WoW — Tier List M+, Cotes PvP en Direct | WoW Guilds",
+    "metaDescription": "Classements en direct des classes World of Warcraft bases sur les donnees reelles. Tier lists M+, cotes PvP, niveaux d'objet et plus.",
+    "description": "Classements en direct de {members} personnages dans {guilds} guildes",
+    "guildsTracked": "Guildes Suivies",
+    "totalCharacters": "Personnages Total",
+    "activeCharacters": "Actifs (30j)",
+    "avgItemLevel": "iLvl Moyen",
+    "classMplusRankings": "Classement M+ par Classe (Score Moyen)",
+    "topMplus": "Top Joueurs Mythique+",
+    "topSoloShuffle": "Top Solo Shuffle",
+    "character": "Personnage",
+    "guild": "Guilde",
+    "class": "Classe",
+    "rating": "Cote",
+    "players": "joueurs",
+    "dataNote": "Donnees mises a jour toutes les 30 minutes via l'API Blizzard et Raider.IO. Les classements sont bases sur les guildes suivies uniquement."
+  },
   "guides": {
     "title": "Guides",
     "description": "Guides World of Warcraft bases sur des donnees reelles",

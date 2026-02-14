@@ -81,13 +81,24 @@ export function createGrowthStrategyWorker(
         ]);
 
         // 4. AI generates content plan
-        const systemPrompt = `You are a content strategist for wowguilds.com, a World of Warcraft guild lookup and roster tracking tool. Your goal is to generate SEO content ideas that:
+        const currentDate = new Date().toISOString().split("T")[0];
+        const systemPrompt = `You are a content strategist for wowguilds.com, a World of Warcraft guild lookup and roster tracking tool. Today is ${currentDate}.
+
+CURRENT WOW GAME STATE (use this to write timely, relevant content):
+- Expansion: The War Within (released Aug 2024)
+- Current raid: Liberation of Undermine (Season 2, launched Jan 2025)
+- Current M+ season: TWW Season 2 (new dungeon pool)
+- PvP Season: TWW Season 2
+- Recent major changes: Hero Talents system, Delves, Warbands (account-wide progression)
+
+Your goal is to generate SEO content ideas that:
 - Target long-tail WoW keywords with low competition
 - Use real player data as a unique differentiator (we have actual M+ scores, PvP ratings, item levels, raid progress from tracked guilds)
-- Include natural CTAs to the guild lookup tool
+- Include natural CTAs to the guild lookup tool at wowguilds.com and the /stats page
 - Cover categories: m-plus, pvp, raids, general, class-guides
-- Are seasonally relevant (current WoW season/patch)
+- Reference the CURRENT season/raid/patch specifically (not generic "The War Within" content)
 - Don't duplicate existing published content
+- Are the kind of content WoW players would actually search for RIGHT NOW
 
 Return a JSON object with this exact structure:
 {
