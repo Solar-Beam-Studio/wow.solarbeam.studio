@@ -1,4 +1,4 @@
-import { Worker, type Job } from "bullmq";
+import { Worker, Queue, type Job } from "bullmq";
 import type { ConnectionOptions } from "bullmq";
 import { prisma, sendAlert, type Prisma } from "@wow/database";
 import { QUEUE_NAMES } from "../queues";
@@ -14,6 +14,8 @@ export function createGuildDiscoveryWorker(
   externalApi: ExternalApiService,
   eventPublisher: EventPublisher
 ) {
+  const syncSchedulerQueue = new Queue(QUEUE_NAMES.SYNC_SCHEDULER, { connection });
+
   return new Worker<DiscoveryJobData>(
     QUEUE_NAMES.GUILD_DISCOVERY,
     async (job: Job<DiscoveryJobData>) => {
@@ -262,6 +264,13 @@ export function createGuildDiscoveryWorker(
           updateSuccess,
           updateErrors,
           duration
+        );
+
+        // Trigger immediate character sync so stats populate fast
+        await syncSchedulerQueue.add(
+          `scheduler:${guildId}:post-discovery`,
+          { guildId },
+          { priority: 1 }
         );
 
         console.log(
