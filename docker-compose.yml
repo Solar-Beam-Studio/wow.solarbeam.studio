@@ -1,5 +1,6 @@
 services:
   redis:
+    container_name: wowguilds-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
@@ -39,6 +40,7 @@ services:
       retries: 3
 
   worker:
+    container_name: wowguilds-worker
     build:
       context: .
       dockerfile: apps/worker/Dockerfile
