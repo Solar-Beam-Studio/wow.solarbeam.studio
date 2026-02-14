@@ -13,22 +13,31 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
 
-  const guide = await prisma.guide.findUnique({
-    where: { slug_locale: { slug, locale } },
-    select: { metaTitle: true, metaDescription: true, slug: true },
-  });
+  const [guide, translations] = await Promise.all([
+    prisma.guide.findUnique({
+      where: { slug_locale: { slug, locale } },
+      select: { metaTitle: true, metaDescription: true, slug: true },
+    }),
+    prisma.guide.findMany({
+      where: { slug, status: "published" },
+      select: { locale: true },
+    }),
+  ]);
 
   if (!guide) return {};
+
+  const languages: Record<string, string> = {};
+  for (const t of translations) {
+    const prefix = t.locale === "en" ? "" : `/${t.locale}`;
+    languages[t.locale] = `${prefix}/guides/${guide.slug}`;
+  }
 
   return {
     title: guide.metaTitle || guide.slug,
     description: guide.metaDescription,
     alternates: {
       canonical: `/guides/${guide.slug}`,
-      languages: {
-        en: `/guides/${guide.slug}`,
-        fr: `/fr/guides/${guide.slug}`,
-      },
+      languages,
     },
     openGraph: {
       title: guide.metaTitle || undefined,

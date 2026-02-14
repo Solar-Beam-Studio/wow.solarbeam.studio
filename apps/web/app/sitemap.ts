@@ -46,38 +46,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  const guides = await prisma.guide.findMany({
-    where: { status: "published", locale: "en" },
-    select: { slug: true, updatedAt: true },
+  const allPublishedGuides = await prisma.guide.findMany({
+    where: { status: "published" },
+    select: { slug: true, locale: true, updatedAt: true },
   });
 
+  // Group by slug to know which translations exist
+  const guidesBySlug = new Map<string, { locales: Set<string>; updatedAt: Date }>();
+  for (const g of allPublishedGuides) {
+    const existing = guidesBySlug.get(g.slug);
+    if (existing) {
+      existing.locales.add(g.locale);
+      if (g.updatedAt > existing.updatedAt) existing.updatedAt = g.updatedAt;
+    } else {
+      guidesBySlug.set(g.slug, { locales: new Set([g.locale]), updatedAt: g.updatedAt });
+    }
+  }
+
   const guideEntries: MetadataRoute.Sitemap = [
-    // Guides index
     {
       url: `${BASE_URL}/guides`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.6,
       alternates: {
-        languages: {
-          en: `${BASE_URL}/guides`,
-          fr: `${BASE_URL}/fr/guides`,
-        },
+        languages: { en: `${BASE_URL}/guides`, fr: `${BASE_URL}/fr/guides` },
       },
     },
-    // Individual guides
-    ...guides.map((guide) => ({
-      url: `${BASE_URL}/guides/${guide.slug}`,
-      lastModified: guide.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-      alternates: {
-        languages: {
-          en: `${BASE_URL}/guides/${guide.slug}`,
-          fr: `${BASE_URL}/fr/guides/${guide.slug}`,
-        },
-      },
-    })),
+    ...Array.from(guidesBySlug.entries()).map(([slug, { locales, updatedAt }]) => {
+      const languages: Record<string, string> = {};
+      if (locales.has("en")) languages.en = `${BASE_URL}/guides/${slug}`;
+      if (locales.has("fr")) languages.fr = `${BASE_URL}/fr/guides/${slug}`;
+      return {
+        url: `${BASE_URL}/guides/${slug}`,
+        lastModified: updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+        alternates: { languages },
+      };
+    }),
   ];
 
   return [...staticEntries, ...guildEntries, ...guideEntries];
