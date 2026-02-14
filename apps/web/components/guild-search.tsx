@@ -230,14 +230,14 @@ export function GuildSearch() {
     <div className="mt-12 w-full max-w-3xl relative">
       <form
         onSubmit={handleSubmit}
-        className={`relative glass p-3 rounded-[2.5rem] transition-all duration-300 ease-out ${
+        className={`relative glass p-3 rounded-2xl md:rounded-[2.5rem] transition-all duration-300 ease-out ${
           isFocused ? "border-white/10 ring-4 ring-violet-500/10 shadow-[0_48px_96px_-24px_rgba(0,0,0,0.8)]" : "shadow-[0_48px_96px_-24px_rgba(0,0,0,0.5)]"
         }`}
         style={{ border: isFocused ? "1px solid rgba(255,255,255,0.1)" : undefined }}
       >
-        <div className="flex items-center">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-0">
           {/* Guild name input */}
-          <div ref={suggestionsRef} className="flex-[1.5] min-w-0 px-6">
+          <div ref={suggestionsRef} className="flex-[1.5] min-w-0 px-4 md:px-6">
             <div className="flex items-center gap-3">
               <Search className={`w-5 h-5 shrink-0 transition-colors duration-300 ${isFocused ? "text-violet-500" : "text-gray-500"}`} />
               <input
@@ -254,129 +254,133 @@ export function GuildSearch() {
                 }}
                 onBlur={() => setIsFocused(false)}
                 placeholder={t("guildNamePlaceholder")}
-                className="w-full bg-transparent text-lg font-bold focus:outline-none placeholder:text-gray-600 placeholder:font-medium h-12"
+                className="w-full bg-transparent text-base md:text-lg font-bold focus:outline-none placeholder:text-gray-600 placeholder:font-medium h-12"
                 required
               />
             </div>
           </div>
 
-          <div className="w-px h-8 bg-white/5 shrink-0" />
+          <div className="hidden md:block w-px h-8 bg-white/5 shrink-0" />
+          <div className="md:hidden h-px w-full bg-white/5" />
 
-          {/* Realm input + autocomplete */}
-          <div ref={realmRef} className="flex-1 relative min-w-0 px-6">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-gray-500 shrink-0" />
-              <input
-                type="text"
-                value={realm}
-                onChange={(e) => {
-                  setRealm(e.target.value);
-                  setRealmOpen(true);
-                }}
-                onFocus={() => {
-                  setRealmOpen(true);
-                  setIsFocused(true);
-                }}
-                onBlur={() => setIsFocused(false)}
-                placeholder={t("realmPlaceholder")}
-                className="w-full bg-transparent text-sm font-bold focus:outline-none h-12 placeholder:font-medium placeholder:text-gray-600"
-                required
-              />
+          {/* Second row on mobile: realm + region + button */}
+          <div className="flex items-center flex-1 min-w-0">
+            {/* Realm input + autocomplete */}
+            <div ref={realmRef} className="flex-1 relative min-w-0 px-4 md:px-6">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-gray-500 shrink-0" />
+                <input
+                  type="text"
+                  value={realm}
+                  onChange={(e) => {
+                    setRealm(e.target.value);
+                    setRealmOpen(true);
+                  }}
+                  onFocus={() => {
+                    setRealmOpen(true);
+                    setIsFocused(true);
+                  }}
+                  onBlur={() => setIsFocused(false)}
+                  placeholder={t("realmPlaceholder")}
+                  className="w-full bg-transparent text-sm font-bold focus:outline-none h-12 placeholder:font-medium placeholder:text-gray-600"
+                  required
+                />
+              </div>
+              {realmOpen && realmFiltered.length > 0 && (
+                <div className="absolute left-0 top-[calc(100%+16px)] w-64 bg-[#111113] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2 transition-all duration-200 ease-out">
+                  <div className="max-h-64 overflow-y-auto space-y-1">
+                    {realmFiltered.map((r) => (
+                      <button
+                        key={r.slug}
+                        type="button"
+                        onClick={() => selectRealm(r)}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${
+                          r.slug === realm
+                            ? "bg-violet-600 text-white"
+                            : "hover:bg-white/5"
+                        }`}
+                      >
+                        <p className="text-sm font-bold">{r.name}</p>
+                        <p className={`text-[11px] font-medium ${r.slug === realm ? "text-white/70" : "text-gray-500"}`}>
+                          {r.slug}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            {realmOpen && realmFiltered.length > 0 && (
-              <div className="absolute left-0 top-[calc(100%+16px)] w-64 bg-[#111113] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden p-2 transition-all duration-200 ease-out">
-                <div className="max-h-64 overflow-y-auto space-y-1">
-                  {realmFiltered.map((r) => (
+
+            <div className="w-px h-8 bg-white/5 shrink-0" />
+
+            {/* Region select */}
+            <div className="relative px-4 md:px-6">
+              <button
+                ref={regionBtnRef}
+                type="button"
+                onClick={() => {
+                  updateRegionMenuPos();
+                  setRegionOpen(!regionOpen);
+                }}
+                className="flex items-center gap-2 h-12 transition-all text-gray-400 hover:text-white"
+              >
+                <span className="text-base">{regions.find(r => r.id === region)?.flag}</span>
+                <span className="text-xs font-black uppercase tracking-wider">{region}</span>
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${regionOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {mounted && regionOpen && createPortal(
+                <div
+                  className="fixed z-[9999] w-40 bg-[#111113] border border-white/10 rounded-2xl shadow-2xl p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                  style={{ top: regionMenuPos.top, left: regionMenuPos.left }}
+                >
+                  <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5 mb-1">
+                    {t("selectRegion")}
+                  </div>
+                  {regions.map((r) => (
                     <button
-                      key={r.slug}
+                      key={r.id}
                       type="button"
-                      onClick={() => selectRealm(r)}
-                      className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${
-                        r.slug === realm
+                      onClick={() => {
+                        setRegion(r.id);
+                        setRegionOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group/reg ${
+                        region === r.id
                           ? "bg-violet-600 text-white"
-                          : "hover:bg-white/5"
+                          : "hover:bg-white/5 text-white"
                       }`}
                     >
-                      <p className="text-sm font-bold">{r.name}</p>
-                      <p className={`text-[10px] font-medium ${r.slug === realm ? "text-white/70" : "text-gray-500"}`}>
-                        {r.slug}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{r.flag}</span>
+                        <span className="text-xs font-bold">{r.id.toUpperCase()}</span>
+                      </div>
+                      <span className={`text-[11px] font-black uppercase opacity-40 group-hover/reg:opacity-100 ${region === r.id ? "text-white opacity-100" : ""}`}>
+                        {r.id}
+                      </span>
                     </button>
                   ))}
-                </div>
-              </div>
-            )}
-          </div>
+                </div>,
+                document.body
+              )}
+            </div>
 
-          <div className="w-px h-8 bg-white/5 shrink-0" />
-
-          {/* Region select */}
-          <div className="relative px-6">
+            {/* Action Button */}
             <button
-              ref={regionBtnRef}
-              type="button"
-              onClick={() => {
-                updateRegionMenuPos();
-                setRegionOpen(!regionOpen);
-              }}
-              className="flex items-center gap-2 h-12 transition-all text-gray-400 hover:text-white"
+              type="submit"
+              disabled={loading}
+              className="h-12 px-6 md:px-10 bg-violet-600 hover:bg-violet-700 text-white rounded-[1.75rem] font-black text-[11px] uppercase tracking-[0.2em] active:scale-95 transition-all disabled:opacity-50 flex items-center gap-3 shadow-lg shadow-violet-600/20 shrink-0"
             >
-              <span className="text-base">{regions.find(r => r.id === region)?.flag}</span>
-              <span className="text-xs font-black uppercase tracking-wider">{region}</span>
-              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${regionOpen ? "rotate-180" : ""}`} />
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <span className="hidden sm:inline">{t("searchButton")}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
-
-            {mounted && regionOpen && createPortal(
-              <div
-                className="fixed z-[9999] w-40 bg-[#111113] border border-white/10 rounded-2xl shadow-2xl p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-                style={{ top: regionMenuPos.top, left: regionMenuPos.left }}
-              >
-                <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5 mb-1">
-                  {t("selectRegion")}
-                </div>
-                {regions.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => {
-                      setRegion(r.id);
-                      setRegionOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group/reg ${
-                      region === r.id
-                        ? "bg-violet-600 text-white"
-                        : "hover:bg-white/5 text-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">{r.flag}</span>
-                      <span className="text-xs font-bold">{r.id.toUpperCase()}</span>
-                    </div>
-                    <span className={`text-[10px] font-black uppercase opacity-40 group-hover/reg:opacity-100 ${region === r.id ? "text-white opacity-100" : ""}`}>
-                      {r.id}
-                    </span>
-                  </button>
-                ))}
-              </div>,
-              document.body
-            )}
           </div>
-
-          {/* Action Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-12 px-10 bg-violet-600 hover:bg-violet-700 text-white rounded-[1.75rem] font-black text-[11px] uppercase tracking-[0.2em] active:scale-95 transition-all disabled:opacity-50 flex items-center gap-3 shadow-lg shadow-violet-600/20 shrink-0"
-          >
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <>
-                <span className="hidden sm:inline">{t("searchButton")}</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
         </div>
       </form>
 
@@ -385,7 +389,7 @@ export function GuildSearch() {
         <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-[#111113] border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden transition-all duration-200 ease-out">
           {!guildName && (
             <div className="p-2 border-b border-white/5 bg-white/[0.02]">
-              <p className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+              <p className="px-3 py-1 text-[11px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
                 <History className="w-3 h-3" />
                 Recent Searches
               </p>
@@ -406,7 +410,7 @@ export function GuildSearch() {
                   </div>
                   <div>
                     <p className="text-sm font-bold">{s.name}</p>
-                    <p className="text-[10px] opacity-70 font-medium">
+                    <p className="text-[11px] opacity-70 font-medium">
                       {s.realm} — {s.region.toUpperCase()}
                     </p>
                   </div>
@@ -438,13 +442,13 @@ export function GuildSearch() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-bold truncate">{g.name}</p>
-                    <p className="text-[10px] opacity-70 font-medium truncate">
+                    <p className="text-[11px] opacity-70 font-medium truncate">
                       {g.realm} — {g.region.toUpperCase()}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono opacity-50 font-bold group-hover/item:opacity-80">
+                  <span className="text-[11px] font-mono opacity-50 font-bold group-hover/item:opacity-80">
                     {g.memberCount} {t("chars")}
                   </span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover/item:opacity-100 transition-all translate-x-[-4px] group-hover/item:translate-x-0" />

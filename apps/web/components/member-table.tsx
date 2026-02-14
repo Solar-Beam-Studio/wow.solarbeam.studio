@@ -72,7 +72,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
             >
               {m.characterName}
             </span>
-            <span className="text-[10px] font-medium text-[var(--text-secondary)] opacity-50 uppercase tracking-widest">
+            <span className="text-[11px] font-medium text-[var(--text-secondary)] opacity-50 uppercase tracking-widest">
               {m.characterClass} • {m.realm}
             </span>
           </div>
@@ -91,6 +91,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       key: "level",
       label: t("level"),
       align: "right",
+      hiddenOnMobile: true,
       sortValue: (m) => m.level ?? 0,
       render: (m) => (
         <span className="font-mono text-[0.8125rem] opacity-30 tabular-nums">{m.level || "-"}</span>
@@ -140,6 +141,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       key: "weeklyKeysCompleted",
       label: t("vault"),
       align: "right",
+      hiddenOnMobile: true,
       sortValue: (m) => m.weeklyKeysCompleted ?? 0,
       render: (m) => {
         const runs = m.weeklyKeysCompleted ?? 0;
@@ -182,6 +184,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       key: "achievementPoints",
       label: t("achievements"),
       align: "right",
+      hiddenOnMobile: true,
       sortValue: (m) => m.achievementPoints ?? 0,
       render: (m) => (
         <span className={`text-[0.8125rem] font-mono font-medium tabular-nums ${ratingColor(m.achievementPoints, "achievement")}`}>
@@ -199,6 +202,7 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       key: pvp.key,
       label: pvp.label,
       align: "right" as const,
+      hiddenOnMobile: true,
       sortValue: (m: GuildMember) => (m[pvp.key as keyof GuildMember] as number | null) ?? 0,
       render: (m: GuildMember) => {
         const val = m[pvp.key as keyof GuildMember] as number | null;
@@ -213,9 +217,10 @@ export function MemberTable({ members, region, search }: MemberTableProps) {
       key: "lastUpdated",
       label: t("updated"),
       align: "right",
+      hiddenOnMobile: true,
       sortValue: (m) => (m.lastUpdated ? new Date(m.lastUpdated).getTime() : 0),
       render: (m) => (
-        <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] opacity-20 tabular-nums uppercase">
+        <span className="text-[11px] font-mono font-medium text-[var(--text-secondary)] opacity-30 tabular-nums uppercase">
           {m.lastUpdated
             ? new Date(m.lastUpdated).toLocaleDateString(locale, { month: "short", day: "numeric" })
             : "-"}

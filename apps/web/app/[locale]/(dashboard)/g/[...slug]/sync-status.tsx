@@ -152,7 +152,7 @@ export function SyncStatus({
           <HelpCircle className="w-3.5 h-3.5" />
         </button>
         {showInfo && (
-          <div className="absolute left-0 top-full mt-2 z-50 w-72 rounded-xl border border-white/10 bg-[#111113] p-4 shadow-xl text-[11px] text-gray-400 space-y-1.5">
+          <div className="absolute left-0 top-full mt-2 z-50 w-[min(18rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-[#111113] p-4 shadow-xl text-[11px] text-gray-400 space-y-1.5">
             <p className="text-xs font-bold text-gray-300">{t("syncInfoTitle")}</p>
             <p>{t("syncInfoStats", { min: syncIntervalMin })}</p>
             <p>{t("syncInfoRoster", { hours: discoveryIntervalHours })}</p>

@@ -8,6 +8,7 @@ export interface Column<T> {
   label: string;
   align?: "left" | "center" | "right";
   sticky?: boolean;
+  hiddenOnMobile?: boolean;
   render: (row: T) => ReactNode;
   sortValue?: (row: T) => string | number | null;
 }
@@ -94,7 +95,7 @@ export function DataTable<T>({
                   key={col.key}
                   className={`${sortable && col.sortValue ? "cursor-pointer" : ""} select-none transition-colors group ${
                     col.sticky ? "sticky left-0 z-40 bg-inherit" : ""
-                  } ${alignClass(col.align)}`}
+                  } ${col.hiddenOnMobile ? "hidden md:table-cell" : ""} ${alignClass(col.align)}`}
                   onClick={() => col.sortValue && handleSort(col.key)}
                 >
                   <div className={`flex items-center gap-1 ${alignFlex(col.align)}`}>
@@ -125,7 +126,7 @@ export function DataTable<T>({
                     key={col.key}
                     className={`whitespace-nowrap ${alignClass(col.align)} ${
                       col.sticky ? "sticky left-0 z-10 bg-inherit group-hover:bg-inherit" : ""
-                    }`}
+                    } ${col.hiddenOnMobile ? "hidden md:table-cell" : ""}`}
                   >
                     {col.render(row)}
                   </td>

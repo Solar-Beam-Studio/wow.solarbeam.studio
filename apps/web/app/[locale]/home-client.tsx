@@ -74,7 +74,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
       <header className="w-full px-8 py-5 flex items-center justify-between animate-fade-in delay-0">
         <AppLogo href="/" mode="full" />
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
+          <div className="hidden md:flex items-center gap-4 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">
             <span>{guilds.length} {t("verifiedGuilds")}</span>
             <span className="text-white/10">/</span>
             <span>{totalMembers.toLocaleString()} {t("characters")}</span>
