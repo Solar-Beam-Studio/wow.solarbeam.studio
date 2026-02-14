@@ -8,7 +8,7 @@ import { AppLogo } from "@/components/app-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { GuildCrest } from "@/components/guild-crest";
 import { Footer } from "@/components/footer";
-import { Eye, Activity, Users, History } from "lucide-react";
+import { Activity, History } from "lucide-react";
 import { guildPath } from "@/lib/guild-url";
 
 interface ActivityItem {
@@ -74,16 +74,6 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
       <header className="w-full px-8 py-5 flex items-center justify-between animate-fade-in delay-0">
         <AppLogo href="/" mode="full" />
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-4 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">
-            <span>{guilds.length} {t("verifiedGuilds")}</span>
-            <span className="text-white/10">/</span>
-            <span>{totalMembers.toLocaleString()} {t("characters")}</span>
-            <span className="text-white/10">/</span>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span>{activeMembers.toLocaleString()} {t("activePlayers")}</span>
-            </div>
-          </div>
           <Link href="/stats" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
             Stats
           </Link>
@@ -110,19 +100,15 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
           <GuildSearch />
         </div>
 
-        {/* Value props */}
-        <div className="flex flex-wrap justify-center gap-6 mt-8 animate-fade-up delay-4">
-          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
-            <Eye className="w-3.5 h-3.5 text-violet-500" />
-            {t("valueProp1")}
-          </div>
-          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
-            <Activity className="w-3.5 h-3.5 text-violet-500" />
-            {t("valueProp2")}
-          </div>
-          <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
-            <Users className="w-3.5 h-3.5 text-violet-500" />
-            {t("valueProp3")}
+        {/* Live stats */}
+        <div className="flex flex-wrap justify-center gap-4 mt-8 animate-fade-up delay-4 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">
+          <span>{guilds.length} {t("verifiedGuilds")}</span>
+          <span className="text-white/10">/</span>
+          <span>{totalMembers.toLocaleString()} {t("characters")}</span>
+          <span className="text-white/10">/</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <span>{activeMembers.toLocaleString()} {t("activePlayers")}</span>
           </div>
         </div>
 
