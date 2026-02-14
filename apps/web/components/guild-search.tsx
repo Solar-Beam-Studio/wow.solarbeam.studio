@@ -466,7 +466,7 @@ export function GuildSearch() {
             <div className="p-2 border-b border-white/5 bg-white/[0.02]">
               <p className="px-3 py-1 text-[11px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
                 <History className="w-3 h-3" />
-                Recent Searches
+                {t("recentlySearched")}
               </p>
             </div>
           )}
