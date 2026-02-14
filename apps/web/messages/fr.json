@@ -117,6 +117,7 @@
     "notFound": "Guilde Introuvable",
     "tabLeaderboard": "Classement",
     "tabRoster": "Effectif",
+    "tabActivity": "Activite",
     "updatedAgo": "Mis a jour {time}",
     "syncing": "Synchronisation...",
     "firstSync": "Premiere synchronisation en cours...",
@@ -136,6 +137,21 @@
     "liveActivity": "Activite en direct",
     "waitingForEvents": "En attente de synchronisations...",
     "scanningRealms": "Scan des royaumes en cours..."
+  },
+  "activityFeed": {
+    "empty": "Aucune activite pour le moment. Les evenements apparaitront apres la prochaine synchronisation.",
+    "memberJoined": "a rejoint la guilde",
+    "memberLeft": "a quitte la guilde",
+    "membersWord": "membres",
+    "massDeparture": "ont quitte la guilde",
+    "mplusMilestone": "a atteint {score} en score M+",
+    "pvpMilestone": "a atteint {rating} en {bracket}",
+    "raidProgress": "a progresse a {progress}",
+    "playerReturned": "est de nouveau actif",
+    "playerInactive": "est devenu inactif",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "loadMore": "Charger plus"
   },
   "footer": {
     "copyright": "Tous droits reserves",

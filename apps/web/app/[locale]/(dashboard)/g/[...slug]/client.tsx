@@ -6,21 +6,27 @@ import { Search } from "lucide-react";
 import { MemberTable } from "@/components/member-table";
 import { LeaderboardGrid } from "@/components/leaderboard-grid";
 import { buildCategories } from "@/lib/leaderboard";
+import { ActivityFeed } from "./activity-feed";
 import type { GuildMember } from "@/hooks/use-members";
 
-type Tab = "leaderboard" | "roster";
+type Tab = "leaderboard" | "roster" | "activity";
 
 function getTabFromHash(): Tab {
   if (typeof window === "undefined") return "leaderboard";
-  return window.location.hash === "#roster" ? "roster" : "leaderboard";
+  const hash = window.location.hash;
+  if (hash === "#roster") return "roster";
+  if (hash === "#activity") return "activity";
+  return "leaderboard";
 }
 
 export function PublicGuildClient({
   members,
   region,
+  guildId,
 }: {
   members: GuildMember[];
   region: string;
+  guildId: string;
 }) {
   const [tab, setTab] = useState<Tab>("leaderboard");
   const [search, setSearch] = useState("");
@@ -37,7 +43,7 @@ export function PublicGuildClient({
 
   function switchTab(newTab: Tab) {
     setTab(newTab);
-    window.history.replaceState(null, "", newTab === "leaderboard" ? " " : "#roster");
+    window.history.replaceState(null, "", newTab === "leaderboard" ? " " : `#${newTab}`);
   }
 
   const categories = useMemo(
@@ -69,6 +75,16 @@ export function PublicGuildClient({
         >
           {t("tabRoster")}
         </button>
+        <button
+          onClick={() => switchTab("activity")}
+          className={`pb-4 text-sm uppercase transition-colors ${
+            tab === "activity"
+              ? "font-black tracking-[0.2em] border-b-2 border-violet-500 text-white"
+              : "font-bold tracking-wider text-gray-600 hover:text-gray-300"
+          }`}
+        >
+          {t("tabActivity")}
+        </button>
       </div>
 
       {tab === "leaderboard" && <LeaderboardGrid categories={categories} />}
@@ -88,6 +104,8 @@ export function PublicGuildClient({
           <MemberTable members={members} region={region} search={search} />
         </div>
       )}
+
+      {tab === "activity" && <ActivityFeed guildId={guildId} />}
     </div>
   );
 }

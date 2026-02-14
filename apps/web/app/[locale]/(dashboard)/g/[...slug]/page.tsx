@@ -261,7 +261,7 @@ export default async function PublicGuildPage({ params }: Props) {
         </div>
       </div>
 
-      <PublicGuildClient members={serialized} region={guild.region} />
+      <PublicGuildClient members={serialized} region={guild.region} guildId={guild.id} />
     </div>
     </>
   );

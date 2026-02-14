@@ -117,6 +117,7 @@
     "notFound": "Guild Not Found",
     "tabLeaderboard": "Leaderboard",
     "tabRoster": "Roster",
+    "tabActivity": "Activity",
     "updatedAgo": "Updated {time}",
     "syncing": "Syncing...",
     "firstSync": "First sync in progress...",
@@ -136,6 +137,21 @@
     "liveActivity": "Live Activity",
     "waitingForEvents": "Waiting for sync events...",
     "scanningRealms": "Scanning realms for updates..."
+  },
+  "activityFeed": {
+    "empty": "No activity yet. Events will appear after the next sync.",
+    "memberJoined": "joined the guild",
+    "memberLeft": "left the guild",
+    "membersWord": "members",
+    "massDeparture": "left the guild",
+    "mplusMilestone": "reached {score} M+ score",
+    "pvpMilestone": "reached {rating} in {bracket}",
+    "raidProgress": "progressed to {progress}",
+    "playerReturned": "is active again",
+    "playerInactive": "went inactive",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "loadMore": "Load more"
   },
   "footer": {
     "copyright": "All rights reserved",

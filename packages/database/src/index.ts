@@ -6,6 +6,7 @@ export type {
   Verification,
   Guild,
   GuildMember,
+  GuildEvent,
   SyncJob,
   SyncError,
   SyncLog,

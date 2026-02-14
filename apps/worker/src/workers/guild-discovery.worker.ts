@@ -1,6 +1,6 @@
 import { Worker, type Job } from "bullmq";
 import type { ConnectionOptions } from "bullmq";
-import { prisma, sendAlert } from "@wow/database";
+import { prisma, sendAlert, type Prisma } from "@wow/database";
 import { QUEUE_NAMES } from "../queues";
 import type { ExternalApiService } from "../services/external-api.service";
 import type { EventPublisher } from "../services/event-publisher.service";
@@ -46,7 +46,16 @@ export function createGuildDiscoveryWorker(
       });
 
       try {
-        // Step 1: Fetch roster from Blizzard
+        // Step 1: Snapshot existing members for event detection
+        const existingMembers = await prisma.guildMember.findMany({
+          where: { guildId },
+          select: { characterName: true, characterClass: true, activityStatus: true },
+        });
+        const existingByName = new Map(
+          existingMembers.map((m) => [m.characterName, m])
+        );
+
+        // Step 2: Fetch roster from Blizzard
         const members = await externalApi.getMembers(
           guild.name,
           guild.realm,
@@ -67,8 +76,10 @@ export function createGuildDiscoveryWorker(
           data: { totalItems: members.length },
         });
 
-        // Step 2: Upsert members
+        // Step 3: Upsert members + detect joins
         let upsertErrors = 0;
+        const events: Prisma.GuildEventCreateManyInput[] = [];
+
         for (const member of members) {
           try {
             await prisma.guildMember.upsert({
@@ -94,6 +105,16 @@ export function createGuildDiscoveryWorker(
                 characterApiUrl: member.characterApiUrl,
               },
             });
+
+            // Detect new members (only if guild already had members — skip first discovery)
+            if (existingByName.size > 0 && !existingByName.has(member.name)) {
+              events.push({
+                guildId,
+                type: "member_joined",
+                characterName: member.name,
+                characterClass: member.characterClass ?? undefined,
+              });
+            }
           } catch (error) {
             upsertErrors++;
             console.error(
@@ -102,7 +123,7 @@ export function createGuildDiscoveryWorker(
           }
         }
 
-        // Step 3: Bulk check activity
+        // Step 4: Bulk check activity + detect activity flips
         const activityResults = await externalApi.bulkCheckActivity(
           members,
           guild.region
@@ -115,11 +136,13 @@ export function createGuildDiscoveryWorker(
             const updateData: Record<string, unknown> = {
               lastActivityCheck: new Date(),
             };
+            let newStatus = "inactive";
             if (result.activityData.lastLoginTimestamp) {
               updateData.lastLoginTimestamp = BigInt(
                 result.activityData.lastLoginTimestamp
               );
-              updateData.activityStatus = result.activityData.activityStatus;
+              newStatus = result.activityData.activityStatus;
+              updateData.activityStatus = newStatus;
             } else {
               updateData.activityStatus = "inactive";
             }
@@ -135,32 +158,73 @@ export function createGuildDiscoveryWorker(
               data: updateData,
             });
             updateSuccess++;
+
+            // Detect activity status flips
+            const old = existingByName.get(result.characterName);
+            if (old && old.activityStatus !== newStatus) {
+              if (newStatus === "active" && old.activityStatus === "inactive") {
+                events.push({
+                  guildId,
+                  type: "player_returned",
+                  characterName: result.characterName,
+                  characterClass: old.characterClass ?? undefined,
+                });
+              } else if (newStatus === "inactive" && old.activityStatus === "active") {
+                events.push({
+                  guildId,
+                  type: "player_inactive",
+                  characterName: result.characterName,
+                  characterClass: old.characterClass ?? undefined,
+                });
+              }
+            }
           } catch {
             updateErrors++;
           }
         }
 
-        // Step 4: Remove departed members
+        // Step 5: Remove departed members + detect departures
         const currentNames = new Set(members.map((m) => m.name));
-        const existingMembers = await prisma.guildMember.findMany({
-          where: { guildId },
-          select: { characterName: true },
-        });
-
         const departed = existingMembers
-          .filter((m) => !currentNames.has(m.characterName))
-          .map((m) => m.characterName);
+          .filter((m) => !currentNames.has(m.characterName));
 
         if (departed.length > 0) {
           await prisma.guildMember.deleteMany({
             where: {
               guildId,
-              characterName: { in: departed },
+              characterName: { in: departed.map((m) => m.characterName) },
             },
           });
+
+          if (departed.length >= 3) {
+            events.push({
+              guildId,
+              type: "mass_departure",
+              data: {
+                count: departed.length,
+                departed: departed.map((m) => m.characterName),
+              },
+            });
+          } else {
+            for (const m of departed) {
+              events.push({
+                guildId,
+                type: "member_left",
+                characterName: m.characterName,
+                characterClass: m.characterClass ?? undefined,
+              });
+            }
+          }
+
           console.log(
             `[Discovery] Removed ${departed.length} departed members`
           );
+        }
+
+        // Step 5b: Batch insert events
+        if (events.length > 0) {
+          await prisma.guildEvent.createMany({ data: events });
+          console.log(`[Discovery] Created ${events.length} events for ${guild.name}`);
         }
 
         // Step 5: Fetch guild crest

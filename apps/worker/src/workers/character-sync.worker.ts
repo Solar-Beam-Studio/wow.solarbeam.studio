@@ -1,6 +1,6 @@
 import { Worker, type Job } from "bullmq";
 import type { ConnectionOptions } from "bullmq";
-import { prisma, sendAlert } from "@wow/database";
+import { prisma, sendAlert, type Prisma } from "@wow/database";
 import { QUEUE_NAMES } from "../queues";
 import type { ExternalApiService } from "../services/external-api.service";
 import type { EventPublisher } from "../services/event-publisher.service";
@@ -40,14 +40,38 @@ export function createCharacterSyncWorker(
       const guild = await prisma.guild.findUnique({ where: { id: guildId } });
       if (!guild) return;
 
+      const MPLUS_MILESTONES = [2000, 2500, 3000, 3500];
+      const PVP_MILESTONES = [1800, 2100, 2400];
       let syncedCount = 0;
       let errorCount = 0;
+      const events: Prisma.GuildEventCreateManyInput[] = [];
 
       for (let i = 0; i < characters.length; i++) {
         const char = characters[i];
         let hadError = false;
 
         try {
+          // Fetch old values for milestone detection
+          const old = await prisma.guildMember.findUnique({
+            where: {
+              guildId_characterName_realm: {
+                guildId,
+                characterName: char.characterName,
+                realm: char.realm,
+              },
+            },
+            select: {
+              mythicPlusScore: true,
+              raidProgress: true,
+              soloShuffleRating: true,
+              pvp2v2Rating: true,
+              pvp3v3Rating: true,
+              pvpRbgRating: true,
+              rbgShuffleRating: true,
+              characterClass: true,
+            },
+          });
+
           const data = await externalApi.getMember(
             char.characterName,
             char.realm,
@@ -85,6 +109,63 @@ export function createCharacterSyncWorker(
               lastUpdated: new Date(),
             },
           });
+
+          // Detect milestones
+          if (old) {
+            const charClass = data.characterClass || old.characterClass || char.characterClass;
+
+            // M+ milestone
+            const oldScore = old.mythicPlusScore ?? 0;
+            const newScore = data.mythicPlusScore ?? 0;
+            for (const milestone of MPLUS_MILESTONES) {
+              if (oldScore < milestone && newScore >= milestone) {
+                events.push({
+                  guildId,
+                  type: "mplus_milestone",
+                  characterName: char.characterName,
+                  characterClass: charClass ?? undefined,
+                  data: { oldScore, newScore, milestone },
+                });
+                break; // Only emit highest milestone crossed
+              }
+            }
+
+            // PvP milestones
+            const pvpFields = {
+              soloShuffleRating: { old: old.soloShuffleRating, new: data.soloShuffleRating, label: "Solo Shuffle" },
+              pvp2v2Rating: { old: old.pvp2v2Rating, new: data.pvp2v2Rating, label: "2v2" },
+              pvp3v3Rating: { old: old.pvp3v3Rating, new: data.pvp3v3Rating, label: "3v3" },
+              pvpRbgRating: { old: old.pvpRbgRating, new: data.pvpRbgRating, label: "RBG" },
+              rbgShuffleRating: { old: old.rbgShuffleRating, new: data.rbgShuffleRating, label: "Blitz" },
+            };
+            for (const [, bracket] of Object.entries(pvpFields)) {
+              const oldRating = bracket.old ?? 0;
+              const newRating = bracket.new ?? 0;
+              for (const milestone of PVP_MILESTONES) {
+                if (oldRating < milestone && newRating >= milestone) {
+                  events.push({
+                    guildId,
+                    type: "pvp_milestone",
+                    characterName: char.characterName,
+                    characterClass: charClass ?? undefined,
+                    data: { oldRating, newRating, milestone, bracket: bracket.label },
+                  });
+                  break;
+                }
+              }
+            }
+
+            // Raid progress change
+            if (data.raidProgress && old.raidProgress !== data.raidProgress) {
+              events.push({
+                guildId,
+                type: "raid_progress",
+                characterName: char.characterName,
+                characterClass: charClass ?? undefined,
+                data: { oldProgress: old.raidProgress, newProgress: data.raidProgress },
+              });
+            }
+          }
 
           syncedCount++;
         } catch (error) {
@@ -130,6 +211,12 @@ export function createCharacterSyncWorker(
         if (i < characters.length - 1) {
           await new Promise((r) => setTimeout(r, 1000));
         }
+      }
+
+      // Batch insert detected events
+      if (events.length > 0) {
+        await prisma.guildEvent.createMany({ data: events });
+        console.log(`[CharSync] Created ${events.length} events for batch ${batchIndex + 1}`);
       }
 
       console.log(

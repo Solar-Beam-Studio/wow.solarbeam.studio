@@ -103,6 +103,7 @@ model Guild {
   syncJobs   SyncJob[]
   syncErrors SyncError[]
   syncLogs   SyncLog[]
+  events     GuildEvent[]
 
   @@unique([name, realm, region])
   @@index([userId])
@@ -202,6 +203,20 @@ model SyncLog {
 
   @@index([guildId])
   @@map("sync_logs")
+}
+
+model GuildEvent {
+  id             Int      @id @default(autoincrement())
+  guildId        String
+  guild          Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  type           String   // member_joined, member_left, mass_departure, mplus_milestone, pvp_milestone, raid_progress, player_returned, player_inactive
+  characterName  String?
+  characterClass String?
+  data           Json?    // { oldScore, newScore, milestone, bracket, departed[], count, etc. }
+  createdAt      DateTime @default(now())
+
+  @@index([guildId, createdAt])
+  @@map("guild_events")
 }
 
 // ============================================================================
