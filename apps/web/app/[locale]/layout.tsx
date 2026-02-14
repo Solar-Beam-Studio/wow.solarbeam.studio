@@ -73,7 +73,7 @@ export default async function RootLayout({
           defer
           src="https://api.pirsch.io/pa.js"
           id="pianjs"
-          data-code={process.env.NEXT_PUBLIC_PIRSCH_CODE}
+          data-code="iu73lSPBGtclASDIfg6NTS5pOf4t4TFl"
         />
       </head>
       <body className={`${inter.className} ${rajdhani.variable} ${jetbrainsMono.variable} min-h-screen bg-[#0b0b0d] text-white antialiased`}>
