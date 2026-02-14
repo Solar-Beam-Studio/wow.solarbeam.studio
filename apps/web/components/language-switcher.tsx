@@ -14,7 +14,7 @@ export function LanguageSwitcher() {
   ] as const;
 
   return (
-    <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 gap-0.5">
+    <div className="flex items-center rounded-lg p-0.5 gap-0.5">
       {locales.map((l) => (
         <button
           key={l.code}
@@ -23,10 +23,10 @@ export function LanguageSwitcher() {
               router.replace(pathname, { locale: l.code });
             }
           }}
-          className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${
+          className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
             locale === l.code
-              ? "bg-violet-600 text-white"
-              : "text-gray-500 hover:text-white"
+              ? "text-white bg-white/[0.08]"
+              : "text-zinc-500 hover:text-white"
           }`}
           title={l.code === "fr" ? "Français" : "English"}
         >

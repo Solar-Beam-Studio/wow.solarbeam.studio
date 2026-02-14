@@ -20,8 +20,8 @@ export function AppLogo({
   return (
     <Link href={href} className={`flex items-center gap-3 transition-transform hover:scale-[1.02] ${className ?? ""}`}>
       <img src="/logomark.svg" alt="" className="w-8 h-8 invert dark:invert-0" />
-      <span className="text-2xl font-black tracking-tighter uppercase leading-none">
-        WOW<span className="text-violet-500">GUILDS</span>.COM
+      <span className="text-lg font-extrabold tracking-tight leading-none">
+        Wow<span className="text-violet-500">Guilds</span>
       </span>
     </Link>
   );

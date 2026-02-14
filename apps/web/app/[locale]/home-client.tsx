@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { GuildSearch } from "@/components/guild-search";
-import { AppLogo } from "@/components/app-logo";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { Header } from "@/components/header";
 import { GuildCrest } from "@/components/guild-crest";
 import { Footer } from "@/components/footer";
 import { Activity, History } from "lucide-react";
@@ -70,22 +69,7 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
 
   return (
     <div className="min-h-screen text-white relative z-10">
-      {/* Header */}
-      <header className="w-full px-8 py-5 flex items-center justify-between animate-fade-in delay-0">
-        <AppLogo href="/" mode="full" />
-        <div className="flex items-center gap-6">
-          <Link href="/stats" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
-            Stats
-          </Link>
-          <Link href="/guides" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
-            Guides
-          </Link>
-          <Link href="/faq" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
-            FAQ
-          </Link>
-          <LanguageSwitcher />
-        </div>
-      </header>
+      <Header />
 
       {/* Hero — Google-style centered search */}
       <section className="flex flex-col items-center pt-24 md:pt-32 pb-16 text-center px-4">
