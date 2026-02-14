@@ -20,7 +20,7 @@ interface CompletionResult {
   outputTokens: number;
 }
 
-const DEFAULT_MODEL = "minimax/minimax-m2.5";
+const DEFAULT_MODEL = "google/gemini-2.5-flash";
 const FALLBACK_MODEL = "moonshotai/kimi-k2.5";
 const BUDGET_KEY = "growth:daily_cost";
 const BUDGET_TTL = 86400; // 24h
