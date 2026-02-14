@@ -16,8 +16,8 @@
     "minsAgo": "il y a {n}min",
     "hoursAgo": "il y a {n}h",
     "daysAgo": "il y a {n}j",
-    "rosterSynced": "Roster synchro · {count} membres",
-    "statsUpdated": "Stats màj · {count} personnages",
+    "rosterSynced": "{count} membres scannés",
+    "statsUpdated": "{count} personnages mis à jour",
     "syncEvent": "Synchronisation"
   },
   "home": {

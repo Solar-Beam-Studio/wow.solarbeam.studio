@@ -16,8 +16,8 @@
     "minsAgo": "{n}m ago",
     "hoursAgo": "{n}h ago",
     "daysAgo": "{n}d ago",
-    "rosterSynced": "Roster synced · {count} members",
-    "statsUpdated": "Stats updated · {count} characters",
+    "rosterSynced": "{count} members scanned",
+    "statsUpdated": "{count} characters updated",
     "syncEvent": "Sync event"
   },
   "home": {
