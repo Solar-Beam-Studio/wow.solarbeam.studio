@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Search, Loader2, X, History, ArrowRight, ChevronDown } from "lucide-react";
 import { guildPath } from "@/lib/guild-url";
+import { GuildCrest } from "./guild-crest";
 
 interface Realm {
   name: string;
@@ -18,6 +19,11 @@ interface GuildSuggestion {
   realm: string;
   region: string;
   memberCount: number;
+  crestEmblemId: number | null;
+  crestEmblemColor: string | null;
+  crestBorderId: number | null;
+  crestBorderColor: string | null;
+  crestBgColor: string | null;
 }
 
 interface RecentSearch {
@@ -506,9 +512,20 @@ export function GuildSearch() {
                 className="w-full text-left px-4 py-3 hover:bg-violet-600 hover:text-white rounded-2xl transition-all flex items-center justify-between group/item"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 group-hover/item:bg-white/20 flex items-center justify-center font-bold text-xs uppercase transition-colors">
-                    {g.name[0]}
-                  </div>
+                  {g.crestEmblemId || g.crestBorderId ? (
+                    <GuildCrest
+                      emblemId={g.crestEmblemId}
+                      emblemColor={g.crestEmblemColor}
+                      borderId={g.crestBorderId}
+                      borderColor={g.crestBorderColor}
+                      bgColor={g.crestBgColor}
+                      size={32}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-white/5 group-hover/item:bg-white/20 flex items-center justify-center font-bold text-xs uppercase transition-colors">
+                      {g.name[0]}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="text-sm font-bold truncate">{g.name}</p>
                     <p className="text-[11px] opacity-70 font-medium truncate">
