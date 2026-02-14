@@ -84,6 +84,15 @@ export function HomeClient({ guilds, totalMembers, activeMembers, recentActivity
               <span>{activeMembers.toLocaleString()} {t("activePlayers")}</span>
             </div>
           </div>
+          <Link href="/stats" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
+            Stats
+          </Link>
+          <Link href="/guides" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
+            Guides
+          </Link>
+          <Link href="/faq" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
+            FAQ
+          </Link>
           <LanguageSwitcher />
         </div>
       </header>
